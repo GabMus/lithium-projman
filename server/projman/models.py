@@ -10,20 +10,20 @@ class ProjmanUser(models.Model): #inherits Django default user class
 	def create_user(sender, instance, created, **kwargs):
 		if created:
 			profile, created = ProjmanUser.objects.get_or_create(user=instance)
-			
+
 	post_save.connect(create_user, sender=User)
-	
+
 	def __str__(self):
 		return self.user.username
 
 class Project(models.Model):
-	#id is already defined as default in django 
+	#id is already defined as default in django
 	author=models.ForeignKey('ProjmanUser', null=False)
 	private=models.BooleanField(default=False)
 	date_time=models.DateTimeField(auto_now_add=True)
 	name=models.CharField(max_length=250, blank=False)
 	description=models.TextField(blank=True)
-	
+
 	def __str__(self):
 		return self.name
 
@@ -62,7 +62,7 @@ class Comment_note(models.Model):
 class Participation(models.Model):
 	user=models.ForeignKey('ProjmanUser', null=False)
 	project=models.ForeignKey('Project', null=False)
-	
+
 
 class Designation(models.Model):
 	user=models.ForeignKey('ProjmanUser', null=False)

@@ -62,6 +62,9 @@
     <link rel="import"
     href="{% static 'bower_components/file-upload/file-upload.html' %}">
 
+    <link rel="import"
+    href="{% static 'bower_components/paper-checkbox/paper-checkbox.html' %}">
+
     <style>
         @import url({% static 'theme.css' %});
     </style>
@@ -80,12 +83,21 @@
 		document.getElementById('submitnewproj').addEventListener('iron-form-response', this.formResponse);
 	}
 
+    function addTodo() {
+        document.getElementById('addTodoDialog').open();
+        document.getElementById('submitnewtodo').addEventListener('iron-form-response', this.formResponse);
+    }
+
 	function submitProj() {
 		document.getElementById('submitnewproj').submit();
 	}
 
+    function submitTodo() {
+		document.getElementById('submitnewtodo').submit();
+	}
+
 	function formResponse(e) {
-		location.href="/";
+		location.reload;
 	}
 
   function toggleDrawer() {
@@ -106,28 +118,16 @@
   function openSettings() {
     document.getElementById('settingsdialog').open();
   }
+
+  function toggleTodoDone(id) {
+    document.getElementById('formToggleTodoDone'+id).submit();
+  }
     </script>
 
 
 
 
 <body class="fullbleed vertical layout center">
-
-		<paper-dialog id="newprojdialog" class="pdialog" modal>
-		  <h2>New project...</h2>
-        <form is="iron-form" id="submitnewproj" action="{% url 'submitnewproj' %}" method="POST">
-					{% csrf_token %}
-				<div class="vertical layout">
- 			<paper-input class="cardcontent" label="Name" type="text" name="name" required></paper-input>
- 			<paper-input class="cardcontent" label="Description" type="text" name="description"></paper-input>
- 				</div>
-		  <div class="buttons">
-			<paper-button dialog-dismiss>Cancel</paper-button>
-			<paper-button onclick="submitProj();">Create</paper-button>
-		  </div>
-		  	</form>
-		</paper-dialog>
-
     <!--TODO: implement settings dialog-->
     <paper-dialog id="settingsdialog" class="pdialog" modal>
 		  <h2>Settings</h2>
@@ -135,7 +135,7 @@
           <span>tkn: {{csrfmiddlewaretoken}}</span>
           <file-upload method="POST" target="{% url 'updateavatar' %}" mcsrftoken="{{ csrf_token }}">
             Profile picture</file-upload>
-          
+
  				</div>
 		  <div class="buttons">
 			<paper-button dialog-dismiss>Done</paper-button>
@@ -150,14 +150,9 @@
 		  </div>
 		</paper-dialog>
 
-
-      <div>
-    	<paper-fab id="addfab" icon="add" onClick="addProject()"></paper-fab>
-    	<paper-tooltip for="addfab" position="left">Add project</paper-tooltip>
-    	</div>
-
       <paper-header-panel class="flex" style="width:100%;">
-      <toolbar-element mtitle="" drawerbtn tbarposition="relative" class="paper-header" id="mtbar">
+      <toolbar-element mtitle="{% if userindex %}Projects{% endif %}{% if project %}{{project.name}}{% endif %}"
+      drawerbtn tbarposition="relative" class="paper-header" id="mtbar">
       <paper-icon-button class="middle" icon="menu" onclick="toggleDrawer()"></paper-icon-button>
       </toolbar-element>
 
@@ -166,43 +161,131 @@
 		<div main class="scrollable vertical layout center">
 
 
+    <!-- BEGIN PROJECT SCREEN -->
+    {% if project %}
+    <div>
+    <paper-fab id="addfab" icon="add" onClick="addTodo()"></paper-fab>
+    <paper-tooltip for="addfab" position="left">Add Todo</paper-tooltip>
+    </div>
+
+
+    <paper-dialog id="addTodoDialog" class="pdialog" modal>
+      <h2>New To do...</h2>
+    <form is="iron-form" id="submitnewtodo" action="{% url 'submitnewtodo' %}" method="POST">
+                {% csrf_token %}
+            <div class="vertical layout">
+        <paper-input class="cardcontent" label="Title" type="text" name="title" required></paper-input>
+        <paper-textarea class="cardcontent" label="Details" type="text" name="details"></paper-textarea>
+        <input style="display: none" name="parentproj" value="{{project.id}}"></input>
+            </div>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button onclick="submitTodo();">Create</paper-button>
+      </div>
+        </form>
+    </paper-dialog>
+        {% if todolist %}
+            {% for todo in todolist %}
+                <tweaked-card mtitle="{{todo.title}}" csize="big">
+                    <div class="horizontal layout cardcontent">
+                    <form is="iron-form" id="formToggleTodoDone{{todo.id}}" action="{% url 'toggleTodoDone' todo.id %}" method="POST">
+                        {% csrf_token %}
+                        <paper-checkbox name="todoCheckbox" {% if todo.done %}checked{% endif %} onclick="toggleTodoDone({{todo.id}})"></paper-checkbox>
+                    </form>
+                    <span>{{todo.details}}</span></div>
+                    <div class="card-actions horizontal layout center">
+                        <paper-button onclick="">Comments</paper-button>
+                <span class="flex"></span>
+
+                <div>
+                {% if todo.author.user == user %}
+                <iron-icon icon="bookmark" class="mbadge"></iron-icon>
+                <paper-tooltip position="left">You are the author</paper-tooltip>
+                {% else %}
+                  {% if todo.author.avatar %}
+                    <img class="microavatar" src="{{todo.author.avatar}}"></img>
+                  {% else %}
+                    <iron-icon icon="account-circle"></iron-icon>
+                  {% endif %}
+                <paper-tooltip position="left">{{todo.author.user.username}}</paper-tooltip>
+                {% endif %}
+                                    <!-- TODO: if designation is defined -->
+                                    <iron-icon icon="arrow-forward"></iron-icon>
+            </div></div>
+                </tweaked-card>
+            {% endfor %}
+        {% else %}
+            <h2>Nothing here</h2>
+        {% endif %}
+    {% endif %}
+    <!-- END PROJECT SCREEN -->
+
+
+    <!-- BEGIN PROJECTS OVERVIEW -->
+    {% if userindex %}
+    <div>
+    <paper-fab id="addfab" icon="add" onClick="addProject()"></paper-fab>
+    <paper-tooltip for="addfab" position="left">Add project</paper-tooltip>
+    </div>
+
+
+        <paper-dialog id="newprojdialog" class="pdialog" modal>
+          <h2>New project...</h2>
+        <form is="iron-form" id="submitnewproj" action="{% url 'submitnewproj' %}" method="POST">
+                    {% csrf_token %}
+                <div class="vertical layout">
+            <paper-input class="cardcontent" label="Name" type="text" name="name" required></paper-input>
+            <paper-input class="cardcontent" label="Description" type="text" name="description"></paper-input>
+                </div>
+          <div class="buttons">
+            <paper-button dialog-dismiss>Cancel</paper-button>
+            <paper-button onclick="submitProj();">Create</paper-button>
+          </div>
+            </form>
+        </paper-dialog>
 	{% if projlist %}
 		{% for project in projlist %}
 		<tweaked-card mtitle="{{project.name}}" csize="big">
 			<span class="cardcontent">{{project.description}}</span>
 			<div class="card-actions horizontal layout center">
- 				<paper-button onclick="">Open</paper-button>
+ 				<paper-button onclick="location.href='{% url 'projview' project.id %}'">Open</paper-button>
         <span class="flex"></span>
-        {% if project.author.user == user %}
-        <myproj-badge></myproj-badge>
-        {% else %}
         <div>
+        {% if project.author.user == user %}
+        <iron-icon icon="bookmark" class="mbadge"></iron-icon>
+        <paper-tooltip position="left">You are the author</paper-tooltip>
+        {% else %}
           {% if project.author.avatar %}
-            <img class="microavatar" src="{{project.author.avatar}}"></img>
+            <img class="microavatar" src="/media/{{project.author.avatar}}"></img>
           {% else %}
             <iron-icon icon="account-circle"></iron-icon>
           {% endif %}
         <paper-tooltip position="left">{{project.author.user.username}}</paper-tooltip>
-        </div>
+
         {% endif %}
- 			</div>
-			</tweaked-card>
+ 		</div></div>
+		</tweaked-card>
 		{% endfor %}
     <div class="spacerFab"></div>
 	{% else %}
 		<h2>Nothing here</h2>
 	{% endif %}
+    {% endif %}
+    <!-- END PROJECTS OVERVIEW -->
 
 	</div>
 	<div drawer id="mdrawer" class="vertical layout">
       <div class="drawerheader horizontal layout">
         {% if userpic %}
-          <img id="avatarcircle" src="{{userpic}}"></img>
+          <img id="avatarcircle" src="/media/{{userpic}}"></img>
         {% else %}
           <img id="avatarcircle" src="/media/img/defaultuserpic.png"></img>
         {% endif %}
           <!--<paper-tooltip for="avatarcircle" position="right" >{{user.username}}</paper-tooltip>-->
           <span class="usrname">// {{user.username}}</span>
+      </div>
+      <div class="topbtncont">
+            <paper-button class="fullbleedbtn" onclick="location.href='/'">Projects</paper-button>
       </div>
       <div>
         <div class="bottombtncont">

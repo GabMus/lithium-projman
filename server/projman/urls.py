@@ -14,6 +14,9 @@ urlpatterns = [
 	url(r'^submitnewproj/?', views.submitnewproj, name='submitnewproj'),
 	url(r'^updateavatar/?', views.updateavatar, name='updateavatar'),
 
+	url(r'^project/(?P<projid>[0-9]+)/?$', views.projview, name='projview'),
+	url(r'^submitnewtodo/?', views.submitnewtodo, name='submitnewtodo'),
+	url(r'^toggleTodoDone/(?P<todoid>[0-9]+)/?$', views.toggletododone, name='toggleTodoDone'),
 
 
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.MEDIA_INCOMPLETE_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) #+ static(settings.MEDIA_INCOMPLETE_URL, document_root=settings.MEDIA_ROOT)

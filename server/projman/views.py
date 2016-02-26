@@ -66,7 +66,53 @@ def index(request):
 		for i in partlist:
 			projlist.append(i.project)
 		userpic=puser.avatar
-		context= {'projlist': projlist, 'userpic': userpic}
+		context= {'projlist': projlist, 'userpic': userpic, 'userindex': True}
+
+		return render(request, 'projman/app.html', context)
+	else:
+		#TODO: separate welcome view?
+		return render(request, 'projman/index.html', None)
+
+def toggletododone(request, todoid):
+	puser=get_object_or_404(ProjmanUser, user=request.user)
+	todo=get_object_or_404(To_do, id=todoid)
+	particip=Participation.objects.filter(project=todo.parent_project, user=puser)
+	if request and not request.user.is_anonymous() and particip:
+		print(type(request.POST.get("todoCheckbox")))
+		print(request.POST.get("todoCheckbox"))
+		#inverted booleans, the checkbox returns its state BEFORE it was pressed.
+		if not request.POST.get("todoCheckbox") and not request.POST.get("todoCheckbox")=="":
+			todo.done=True
+		else:
+			todo.done=False
+		todo.save()
+
+	return HttpResponse("200")
+
+def submitnewtodo(request):
+	title=request.POST.get("title")
+	details=request.POST.get("details")
+	proj= get_object_or_404(Project, id= request.POST.get("parentproj"))
+	if request and not request.user.is_anonymous() and title:
+		user=get_object_or_404(ProjmanUser, user=request.user)
+		todo=To_do(title=title, details=details, author=user, parent_project=proj)
+		todo.save()
+		#TODO: designation
+		#des=Participation(user=user, project=proj)
+		#part.save()
+	return HttpResponse('200')
+
+def projview(request, projid):
+	if request and not request.user.is_anonymous():
+		puser=get_object_or_404(ProjmanUser, user=request.user)
+		project=get_object_or_404(Project, id=projid)
+		todolist=To_do.objects.filter(parent_project=project)
+		"""partlist=Participation.objects.filter(user=puser)
+		projlist= []
+		for i in partlist:
+			projlist.append(i.project)"""
+		userpic=puser.avatar
+		context= {'project': project, 'todolist': todolist, 'userpic': puser.avatar}
 
 		return render(request, 'projman/app.html', context)
 	else:
