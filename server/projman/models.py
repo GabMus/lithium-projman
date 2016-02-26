@@ -36,6 +36,9 @@ class To_do(models.Model):
 	done=models.BooleanField(default=False)
 	date_time=models.DateTimeField(auto_now_add=True)
 
+	def __str__(self):
+		return self.author.user.username+" "+self.title
+
 class Comment_todo(models.Model):
 	#id is already defined as default in django
 	author=models.ForeignKey('ProjmanUser', null=False)

@@ -106,13 +106,19 @@ def projview(request, projid):
 	if request and not request.user.is_anonymous():
 		puser=get_object_or_404(ProjmanUser, user=request.user)
 		project=get_object_or_404(Project, id=projid)
-		todolist=To_do.objects.filter(parent_project=project)
+		todolist=To_do.objects.filter(parent_project=project).order_by('done')
 		"""partlist=Participation.objects.filter(user=puser)
 		projlist= []
 		for i in partlist:
 			projlist.append(i.project)"""
+		designations=[]
+		for i in todolist:
+			d=Designation.objects.filter(todo=i)
+			for j in d:
+				designations.append(j)
+
 		userpic=puser.avatar
-		context= {'project': project, 'todolist': todolist, 'userpic': puser.avatar}
+		context= {'project': project, 'todolist': todolist, 'userpic': puser.avatar, 'designations': designations}
 
 		return render(request, 'projman/app.html', context)
 	else:
