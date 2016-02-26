@@ -1,0 +1,33 @@
+<link rel="import"
+  href="/static/bower_components/polymer/polymer.html">
+
+<link rel="import"
+  href="/static/bower_components/iron-icons/iron-icons.html">
+
+<link rel="import"
+  href="/static/bower_components/paper-tooltip/paper-tooltip.html">
+
+<dom-module id="myproj-badge">
+{% verbatim %}
+  <template>
+
+    <style is="custom-style">
+      .mbadge {
+        width: 16px;
+        height: 16px;
+        color: #888888;
+      }
+    </style>
+        <div>
+    		<iron-icon icon="bookmark" class="mbadge"></iron-icon>
+        <paper-tooltip position="left">You are the author</paper-tooltip>
+        </div>
+  </template>
+{% endverbatim %}
+  <script>
+	Polymer({
+		is: "myproj-badge"
+	});
+  </script>
+
+</dom-module>

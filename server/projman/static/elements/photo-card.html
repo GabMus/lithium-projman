@@ -1,0 +1,70 @@
+<link rel="import"
+      href="/static/bower_components/polymer/polymer.html">
+
+<link rel="import"
+    href="/static/bower_components/paper-button/paper-button.html">
+
+<link rel="import"
+    href="/static/bower_components/iron-flex-layout/classes/iron-flex-layout.html">
+
+<link rel="import"
+    href="/static/bower_components/paper-card/paper-card.html">
+
+<dom-module id="photo-card">
+{% verbatim %}
+  <template>
+
+    <style is="custom-style">
+        :host {
+            margin: 24px;
+        }
+    	#mCard {
+    		--paper-card-header-color: white;
+    		min-width: 400px;
+            max-width: 600px;
+            color: #263238;
+    	}
+
+		.description {
+			margin: 24px;
+			text-align: left;
+		}
+    </style>
+                <paper-card heading="{{mtitle}}" image="{{picurl}}" id="mCard">
+                <content class="description"></content>
+                </paper-card>
+
+  </template>
+{% endverbatim %}
+  <script>
+	Polymer({
+		is: "photo-card",
+		properties: {
+			mtitle: {
+				type: String,
+				value: "Card"
+			},
+			desc: {
+				type: String,
+				value: "Hello world!"
+			},
+      		picurl: {
+      			type: String,
+                key: "picurl",
+      			value: ""
+      		},
+      		csize: {
+      			type: String,
+      			value: ""
+      		}
+		},
+
+        ready: function() {
+            if (this.csize=="big") {
+                document.getElementById('mCard').style.maxWidth = "600px";
+            }
+        }
+	});
+  </script>
+
+</dom-module>

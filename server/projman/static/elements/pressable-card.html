@@ -1,0 +1,54 @@
+<link rel="import"
+      href="/static/bower_components/polymer/polymer.html">
+
+<link rel="import"
+    href="/static/bower_components/paper-button/paper-button.html">
+
+<link rel="import"
+    href="/static/elements/tweaked-card.html">
+
+<dom-module id="pressable-card" attributes="mcolor">
+{% verbatim %}
+  <template>
+
+    <style is="custom-style">
+        :host {
+            margin: 24px 24px 0 24px;
+        }
+        .mpressable {
+            margin: 0;
+        }
+
+    </style>
+                        <tweaked-card mtitle="{{mtitle}}" class="mpressable">
+                            <content></content>
+                            <div class="card-actions">
+
+                                <paper-button onclick="location.href='{% url 'post' post.id %}'">View post</paper-button>
+
+                            </div>
+                        </tweaked-card>
+
+  </template>
+{% endverbatim %}
+  <script>
+	Polymer({
+		is: "pressable-card",
+		properties: {
+			mtitle: {
+				type: String,
+				value: ""
+			},
+      		csize: {
+      			type: String,
+      			value: "300"
+      		},
+            mcolor: {
+                type: String,
+                value: ""
+            }
+		}
+	});
+  </script>
+
+</dom-module>

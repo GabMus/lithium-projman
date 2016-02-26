@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="theme-color" content="#EDEDED">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+    <title>Lithium // Project Manager</title>
+
+    <script src="{% static 'bower_components/webcomponentsjs/webcomponents-lite.min.js' %}"></script>
+
+    <link rel="import"
+    href="{% static 'bower_components/paper-fab/paper-fab.html' %}">
+
+    <link rel="import"
+    href="{% static 'bower_components/iron-icons/iron-icons.html' %}">
+
+    <link rel="import"
+    href="{% static 'elements/photo-card.html' %}">
+
+    <link rel="import"
+    href="{% static 'elements/tweaked-card.html' %}">
+
+    <link rel="import"
+    href="{% static 'elements/toolbar-element.html' %}">
+
+    <link rel="import"
+    href="{% static 'bower_components/iron-flex-layout/classes/iron-flex-layout.html' %}">
+
+    <link rel="import"
+    href="{% static 'bower_components/iron-form/iron-form.html' %}">
+
+    <link rel="import"
+    href="{% static 'elements/share-button.html' %}">
+
+  	<link rel="import"
+  	href="{% static 'bower_components/paper-input/paper-input.html' %}">
+
+  	<link rel="import"
+  	href="{% static 'bower_components/paper-input/paper-textarea.html' %}">
+
+    <style>
+        @import url({% static 'theme.css' %});
+    </style>
+</head>
+
+
+	<script>
+    function opendelay(uri) {
+        setTimeout(function () {
+    location.href=uri;
+        }, 500);
+    }
+	var fixed=false;
+	function onHeaderScroll() {
+		var tabs = document.getElementById('tabsBar');
+		if (document.body.scrollTop >= 70 && !fixed) {
+			tabs.style.position = 'fixed';
+			tabs.style.top = '0px';
+			fixed=true;
+		}
+		if (document.body.scrollTop < 70 && fixed) {
+			tabs.style.position = 'relative';
+			fixed=false;
+		}
+	}
+    </script>
+
+
+
+
+<body class="fullbleed vertical layout center">
+	{% if user.is_authenticated %}
+      <toolbar-element mtitle="Lithium" lucid><span>Welcome {{user.username}} <paper-button onclick="location.href='/signout'">Sign out</paper-button></span></toolbar-element>
+	{% else %}
+      <toolbar-element mtitle="Lithium" lucid><paper-button onClick="location.href='/signin'">Log in</paper-button></toolbar-element>
+    {% endif %}
+    	<div class="welcome vertical layout center flex">
+        <div class="welcome-textbox">
+          <h1>Lithium //</h1>
+
+          <h2>// Team work, improved</h2>
+        </div>
+    		<paper-button class="accentbtn bigbtn" onclick="location.href='/signup'">Sign Up</paper-button>
+    	</div>
+
+      <div class="xtracontent">
+        <p>pootis</p><p>pootis</p><p>pootis</p>
+        <p>pootis</p><p>pootis</p><p>pootis</p>
+        <p>pootis</p><p>pootis</p><p>pootis</p>
+        <p>pootis</p><p>pootis</p><p>pootis</p>
+        <p>pootis</p><p>pootis</p><p>pootis</p>
+        <p>pootis</p><p>pootis</p><p>pootis</p>
+      <p>pootis</p><p>pootis</p><p>pootis</p>
+      </div>
+</body>
+</html>

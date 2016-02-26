@@ -1,0 +1,179 @@
+/*
+ * This is a basic set of colors for the
+ * whole project. Edit the values to change
+ * the look of the website.
+ *
+ * colors:
+ * main: #3F51B5
+ * accent: #F50057
+ */
+
+body {
+    background-color: #EDEDED;
+    padding: 0 auto;
+    margin: 0 auto;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 12pt;
+}
+
+.posttitle {
+    font-size: 18pt;
+    font-weight: bold;
+}
+
+.posttext {
+    display: block;
+    font-size: 12pt;
+    margin: 35px;
+    font-weight: lighter;
+    text-align: justify;
+}
+
+.commentmail {
+    font-size: 9pt;
+    margin: 0 20px 20px 20px;
+    font-weight: lighter;
+    font-style: oblique;
+    text-align: left;
+}
+
+.blogtitle {
+    font-size: 24pt;
+    font-weight: bold;
+}
+
+.spacer {
+    margin-top: 24px;
+}
+
+.spacerFab {
+    margin-top: 88px;
+}
+
+.mfab {
+    margin-right: 24px;
+}
+
+.artpic {
+    width: 280px;
+    margin: 12px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, .5);
+}
+
+.tbrtabs {
+    background-color: #2196F3;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+#tabsBar {
+	width: 100%;
+	z-index: 999;
+}
+
+.cardcontent {
+    margin: 0 25px 5px 25px;
+    display: block;
+}
+
+.accentbtn {
+	background-color: #F50057;
+	color: white;
+}
+
+.bigbtn {
+  padding: 18px 28px 18px 28px;
+}
+
+.welcome {
+	background: url("/media/img/splashscreen.jpg") no-repeat center;
+  background-size: cover;
+	height: 100%;
+	width: 100%;
+	margin: 0 0 0 0;
+  position: absolute;
+  z-index: 0;
+}
+
+.xtracontent {
+  position: absolute;
+  width: 100%;
+  top: 100%;
+  z-index: 1;
+}
+
+.welcome-textbox {
+  margin-top: 180px;
+  margin-bottom: 50px;
+  font-family: Roboto Lighter, Roboto Thin, Roboto, Arial, sans-serif;
+  color: white;
+  text-align: center;
+}
+
+#mdrawer {
+	border: 1px solid #CDCDCD;
+}
+
+#addfab {
+	z-index: 22;
+	--paper-fab-background: #F50057;
+	position: fixed;
+	float: right;
+	right: 24px;
+	bottom: 24px;
+}
+
+.pdialog {
+	z-index: 25;
+}
+
+.scrollable {
+  display: block;
+	overflow: auto;
+}
+
+.drawerheader {
+  background: url("/media/img/headerpic.jpg");
+  width: 254px;
+  height: 142px;
+  background-position: center;
+  background-size: cover;
+  color: white;
+}
+
+.usrname {
+  margin-left: 10px;
+  margin-top: 98px;
+  display: inline-block;
+}
+
+#avatarcircle {
+  border-radius: 100%;
+  border: 2px solid #555555;
+  width: 50px;
+  height: 50px;
+  margin-top: 82px;
+  margin-left: 5px;
+}
+
+.microavatar {
+  border-radius: 100%;
+  border: 1px solid #555555;
+  width: 16px;
+  height: 16px;
+}
+
+.fullbleedbtn {
+  margin: 0 auto;
+  border-top: 1px solid #CDCDCD;
+  width: 100%;
+  border-radius: 0px;
+}
+
+.bottombtncont {
+  width: 100%;
+  bottom: 0;
+  position: absolute;
+  border-bottom: 1px solid #CDCDCD;
+}

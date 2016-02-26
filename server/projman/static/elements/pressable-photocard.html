@@ -1,0 +1,50 @@
+<link rel="import"
+      href="/static/bower_components/polymer/polymer.html">
+
+<link rel="import"
+    href="/static/bower_components/paper-button/paper-button.html">
+
+<link rel="import"
+    href="/static/elements/photo-card.html">
+
+<dom-module id="pressable-photocard">
+{% verbatim %}
+  <template>
+    <style is="custom-style">
+        :host {
+            margin: 24px;
+        }
+    </style>
+                    <photo-card mtitle="{{mtitle}}" picurl="{{picurl}}" class="mpressable">
+
+                        <content></content>
+                    </photo-card>
+
+  </template>
+{% endverbatim %}
+  <script>
+	Polymer({
+		is: "pressable-photocard",
+		properties: {
+			mtitle: {
+				type: String,
+				value: "Card"
+			},
+      		picurl: {
+      			type: String,
+                key: "picurl",
+      			value: ""
+      		},
+      		csize: {
+      			type: String,
+      			value: "300"
+      		},
+            posturl: {
+                type: String,
+                value: "#"
+            }
+		}
+	});
+  </script>
+
+</dom-module>

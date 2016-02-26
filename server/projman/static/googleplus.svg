@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   width="24"
+   height="24"
+   viewBox="0 0 24 24"
+   id="svg2"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="twitter.svg">
+  <metadata
+     id="metadata10">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs8">
+    <clipPath
+       id="SVGID_2_">
+      <use
+         id="use4210"
+         overflow="visible"
+         xlink:href="#SVGID_1_"
+         style="overflow:visible"
+         x="0"
+         y="0"
+         width="100%"
+         height="100%" />
+    </clipPath>
+    <clipPath
+       id="SVGID_4_">
+      <use
+         id="use4224"
+         overflow="visible"
+         xlink:href="#SVGID_3_"
+         style="overflow:visible"
+         x="0"
+         y="0"
+         width="100%"
+         height="100%" />
+    </clipPath>
+    <defs
+       id="defs4395">
+      <polyline
+         points="460.851,393.912 420.65,393.912 420.65,353.711 380.448,353.711 380.448,393.912 340.247,393.912     340.247,434.113 380.448,434.113 380.448,474.316 420.65,474.316 420.65,434.113 460.851,434.113   "
+         id="SVGID_3_" />
+    </defs>
+    <clipPath
+       id="SVGID_4_-0">
+      <use
+         id="use4399"
+         overflow="visible"
+         xlink:href="#SVGID_3_"
+         style="overflow:visible"
+         x="0"
+         y="0"
+         width="100%"
+         height="100%" />
+    </clipPath>
+    <defs
+       id="defs4379">
+      <path
+         d="m 159.342,393.912 0,48.249 79.813,0 c -3.219,20.691 -24.135,60.695 -79.813,60.695 -48.044,0 -87.235,-39.808 -87.235,-88.844 0,-49.055 39.191,-88.843 87.235,-88.843 27.333,0 45.627,11.66 56.082,21.71 l 38.178,-36.785 c -24.507,-22.928 -56.268,-36.787 -94.26,-36.787 -77.792,0 -140.705,62.912 -140.705,140.705 0,77.772 62.913,140.705 140.705,140.705 81.206,0 135.089,-57.084 135.089,-137.486 0,-9.265 -1.021,-16.292 -2.239,-23.32 l -132.85,0 0,10e-4 0,0 z m 0,0"
+         id="SVGID_1_"
+         inkscape:connector-curvature="0" />
+    </defs>
+    <clipPath
+       id="SVGID_2_-5">
+      <use
+         id="use4385"
+         overflow="visible"
+         xlink:href="#SVGID_1_"
+         style="overflow:visible"
+         x="0"
+         y="0"
+         width="100%"
+         height="100%" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="970"
+     inkscape:window-height="481"
+     id="namedview6"
+     showgrid="false"
+     inkscape:snap-bbox="true"
+     inkscape:snap-bbox-midpoints="true"
+     inkscape:bbox-nodes="true"
+     inkscape:snap-bbox-edge-midpoints="true"
+     inkscape:zoom="5.12"
+     inkscape:cx="21.193596"
+     inkscape:cy="2.5813399"
+     inkscape:window-x="351"
+     inkscape:window-y="303"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg2" />
+  <path
+     inkscape:connector-curvature="0"
+     id="rect4387"
+     d="m -180.47852,-166.29492 0,281.41015 275.794926,0 0,-281.41015 -275.794926,0 z"
+     clip-path="url(#SVGID_2_-5)"
+     style="fill:#000000" />
+  <g
+     id="g4458"
+     transform="matrix(0.04511023,0,0,0.04511023,10.167213,13.654422)"
+     style="fill:#000000">
+    <use
+       transform="translate(-199.11493,-439.60314)"
+       height="100%"
+       width="100%"
+       y="0"
+       x="0"
+       style="clip-rule:evenodd;overflow:visible;fill:#000000;fill-rule:evenodd"
+       xlink:href="#SVGID_1_"
+       overflow="visible"
+       id="use4382" />
+    <path
+       id="rect4401"
+       d="m 340.24701,353.711 120.604,0 0,120.605 -120.604,0 z"
+       clip-path="url(#SVGID_4_-0)"
+       style="fill:#000000"
+       transform="translate(-199.11493,-439.60314)"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

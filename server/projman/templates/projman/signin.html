@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="theme-color" content="#EDEDED">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+    <title>Lithium // Sign In</title>
+
+    <script src="{% static 'bower_components/webcomponentsjs/webcomponents-lite.min.js' %}"></script>
+
+    <link rel="import"
+    href="{% static 'bower_components/paper-fab/paper-fab.html' %}">
+
+    <link rel="import"
+    href="{% static 'bower_components/iron-icons/iron-icons.html' %}">
+
+    <link rel="import"
+    href="{% static 'elements/photo-card.html' %}">
+
+    <link rel="import"
+    href="{% static 'elements/tweaked-card.html' %}">
+
+    <link rel="import"
+    href="{% static 'elements/toolbar-element.html' %}">
+
+    <link rel="import"
+    href="{% static 'bower_components/iron-flex-layout/classes/iron-flex-layout.html' %}">
+
+    <link rel="import"
+    href="{% static 'bower_components/iron-form/iron-form.html' %}">
+
+    <link rel="import"
+    href="{% static 'elements/share-button.html' %}">
+
+  	<link rel="import"
+  	href="{% static 'bower_components/paper-input/paper-input.html' %}">
+
+  	<link rel="import"
+  	href="{% static 'bower_components/paper-input/paper-textarea.html' %}">
+
+    <style>
+        @import url({% static 'theme.css' %});
+    </style>
+</head>
+
+
+	<script>
+    function opendelay(uri) {
+        setTimeout(function () {
+    location.href=uri;
+        }, 500);
+    }
+	var fixed=false;
+	function onHeaderScroll() {
+		var tabs = document.getElementById('tabsBar');
+		if (document.body.scrollTop >= 70 && !fixed) {
+			tabs.style.position = 'fixed';
+			tabs.style.top = '0px';
+			fixed=true;
+		}
+		if (document.body.scrollTop < 70 && fixed) {
+			tabs.style.position = 'relative';
+			fixed=false;
+		}
+
+
+
+	}
+    </script>
+
+
+
+
+<body>
+    <div class="vertical layout center">
+    <toolbar-element mtitle="// Sign In" tbarposition="relative">
+    </toolbar-element>
+
+    <form is="iron-form" id="signupform" action="{% url 'submitsignin' %}" method="POST">
+     {% csrf_token %}
+     <tweaked-card mtitle="Sign In">
+ 		<div class="vertical layout">
+ 			<paper-input class="cardcontent" label="Username" type="text" name="username" required></paper-input>
+ 			<paper-input class="cardcontent" label="Password" type="password" name="password" required></paper-input>
+ 		</div>
+ 		<div class="card-actions">
+ 			<paper-button onclick="document.getElementById('signupform').submit();">Sign in</paper-button></paper-card>
+ 		</div>
+ 	</tweaked-card>
+     </form>
+     <script>
+     function formResponse(e) {
+ 		console.log(e);
+    	location.href="/"
+ 	}
+ 	document.getElementById('signupform').addEventListener('iron-form-response', this.formResponse);
+     </script>
+
+        <div class="footer"></div>
+</body>
+</html>
