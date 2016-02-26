@@ -80,11 +80,11 @@ def toggletododone(request, todoid):
 	if request and not request.user.is_anonymous() and particip:
 		print(type(request.POST.get("todoCheckbox")))
 		print(request.POST.get("todoCheckbox"))
-		#inverted booleans, the checkbox returns its state BEFORE it was pressed.
+		#IGNOREME inverted booleans, the checkbox returns its state BEFORE it was pressed.
 		if not request.POST.get("todoCheckbox") and not request.POST.get("todoCheckbox")=="":
-			todo.done=True
-		else:
 			todo.done=False
+		else:
+			todo.done=True
 		todo.save()
 
 	return HttpResponse("200")

@@ -94,7 +94,7 @@
 	}
 
 	function formResponse(e) {
-		location.reload;
+		location.reload();
 	}
 
   function toggleDrawer() {
@@ -117,7 +117,11 @@
   }
 
   function toggleTodoDone(id) {
-    document.getElementById('formToggleTodoDone'+id).submit();
+      //why the timeout? cause ONLY on PC, the function is run before the checkbox actually changes value, this causes it to send "false" when activated and "true" when deactivated
+    setTimeout(function () {
+        document.getElementById('formToggleTodoDone'+id).submit();
+        document.getElementById('formToggleTodoDone').addEventListener('iron-form-response', this.formResponse);
+    }, 200);
   }
     </script>
 
@@ -188,9 +192,10 @@
                     <div class="horizontal layout cardcontent">
                     <form is="iron-form" id="formToggleTodoDone{{todo.id}}" action="{% url 'toggleTodoDone' todo.id %}" method="POST">
                         {% csrf_token %}
-                        <paper-checkbox name="todoCheckbox" {% if todo.done %}checked{% endif %} onclick="toggleTodoDone({{todo.id}})"></paper-checkbox>
-                    </form>
-                    <span>{{todo.details}}</span></div>
+                        <paper-checkbox name="todoCheckbox" {% if todo.done %}checked{% endif %} onclick="toggleTodoDone({{todo.id}})">
+
+                        <span>{{todo.details}}</span></paper-checkbox>
+                    </form></div>
                     <div class="card-actions horizontal layout center">
                         <paper-button onclick="">Comments</paper-button>
                 <span class="flex"></span>
@@ -227,6 +232,7 @@
         {% else %}
             <h2>Nothing here</h2>
         {% endif %}
+        <div class="spacerFab"></div>
     {% endif %}
     <!-- END PROJECT SCREEN -->
 
