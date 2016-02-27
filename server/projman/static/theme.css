@@ -77,6 +77,11 @@ body {
     display: block;
 }
 
+.xcardcontent {
+    margin: 25px 25px 25px 25px;
+    display: block;
+}
+
 .accentbtn {
 	background-color: #F50057;
 	color: white;
@@ -157,6 +162,14 @@ body {
   margin-left: 5px;
 }
 
+.piccircle {
+  border-radius: 100%;
+  border: 2px solid #555555;
+  width: 30px;
+  height: 30px;
+  padding: 25px auto;
+}
+
 .microavatar {
   border-radius: 100%;
   border: 1px solid #555555;
@@ -181,4 +194,22 @@ body {
 .topbtncont {
   width: 100%;
   border-bottom: 1px solid #CDCDCD;
+}
+
+.designMenu {
+    max-height: 150px;
+    overflow-y: scroll;
+}
+
+.cardMenuButton {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+.commentAuthor {
+    margin-left: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    display: block;
 }

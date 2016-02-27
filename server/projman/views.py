@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from .models import *
@@ -40,7 +40,7 @@ def submitsignin(request):
 def signout(request):
 	if request:
 		logout(request)
-	return index(None)
+	return redirect("/")
 
 def submitnewproj(request):
 	name=request.POST.get("name")
@@ -90,6 +90,7 @@ def toggletododone(request, todoid):
 	return HttpResponse("200")
 
 def submitnewtodo(request):
+	print(request.POST.get("designations"))
 	title=request.POST.get("title")
 	details=request.POST.get("details")
 	proj= get_object_or_404(Project, id= request.POST.get("parentproj"))
@@ -102,11 +103,71 @@ def submitnewtodo(request):
 		#part.save()
 	return HttpResponse('200')
 
+def deletetodo(request, todoid):
+	puser=get_object_or_404(ProjmanUser, user=request.user)
+	todo=get_object_or_404(To_do, id=todoid)
+	particip=Participation.objects.filter(project=todo.parent_project, user=puser)
+	if request and not request.user.is_anonymous() and particip:
+		proj=todo.parent_project
+		comments=Comment_todo.objects.filter(parent_todo=todo)
+		for i in comments:
+			i.delete()
+		todo.delete()
+	return redirect('/project/'+str(proj.id))
+
+def edittodo(request):
+	puser=get_object_or_404(ProjmanUser, user=request.user)
+	print(request.POST.get("designations"))
+	title=request.POST.get("title")
+	details=request.POST.get("details")
+	todo=get_object_or_404(To_do, id=request.POST.get("todoid"))
+	particip=Participation.objects.filter(project=todo.parent_project, user=puser)
+	if request and not request.user.is_anonymous() and title and particip:
+		todo.title=title
+		todo.details=details
+		todo.save()
+		#TODO: designation
+		#des=Participation(user=user, project=proj)
+		#part.save()
+	return HttpResponse('200')
+
+def deletetodocomment(request, commentid):
+	puser=get_object_or_404(ProjmanUser, user=request.user)
+	comment=get_object_or_404(Comment_todo, id=commentid)
+	particip=Participation.objects.filter(project=comment.parent_todo.parent_project, user=puser)
+	if request and not request.user.is_anonymous() and particip:
+		todo=comment.parent_todo
+		comment.delete()
+	return redirect('/todo/'+str(todo.id))
+
+def todoview(request, todoid):
+	puser=get_object_or_404(ProjmanUser, user=request.user)
+	todo=get_object_or_404(To_do, id=todoid)
+	particip=Participation.objects.filter(project=todo.parent_project, user=puser)
+	participants=Participation.objects.filter(project=todo.parent_project)
+	if request and not request.user.is_anonymous() and particip:
+		commentstodolist=Comment_todo.objects.filter(parent_todo=todo).order_by('date_time')
+		designations=Designation.objects.filter(todo=todo)
+		context= {'commentstodolist': commentstodolist, 'todo': todo, 'designations': designations, 'participants': participants}
+		return render(request, 'projman/app.html', context)
+
+def submittodocomment(request, todoid):
+	puser=get_object_or_404(ProjmanUser, user=request.user)
+	content=request.POST.get("content")
+	todo= get_object_or_404(To_do, id=todoid)
+	particip=Participation.objects.filter(project=todo.parent_project, user=puser)
+	if request and not request.user.is_anonymous() and particip and content:
+		print("all passed")
+		comment=Comment_todo(author=puser, content=content, parent_todo=todo)
+		comment.save()
+	return HttpResponse('200')
+
 def projview(request, projid):
 	if request and not request.user.is_anonymous():
 		puser=get_object_or_404(ProjmanUser, user=request.user)
 		project=get_object_or_404(Project, id=projid)
 		todolist=To_do.objects.filter(parent_project=project).order_by('done')
+		particip=Participation.objects.filter(project=project)
 		"""partlist=Participation.objects.filter(user=puser)
 		projlist= []
 		for i in partlist:
@@ -118,7 +179,7 @@ def projview(request, projid):
 				designations.append(j)
 
 		userpic=puser.avatar
-		context= {'project': project, 'todolist': todolist, 'userpic': puser.avatar, 'designations': designations}
+		context= {'project': project, 'todolist': todolist, 'userpic': puser.avatar, 'designations': designations, 'participants': particip}
 
 		return render(request, 'projman/app.html', context)
 	else:

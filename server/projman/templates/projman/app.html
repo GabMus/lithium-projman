@@ -7,6 +7,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
+    <link rel="shortcut icon" type="image/png"
+          href="{% static 'favicon.ico' %}"/>
+<link rel="apple-touch-icon" href="{% static 'appicon.png' %}">
     <title>Lithium // Project Manager</title>
 
     <script src="{% static 'bower_components/webcomponentsjs/webcomponents-lite.min.js' %}"></script>
@@ -62,6 +65,15 @@
     <link rel="import"
     href="{% static 'bower_components/paper-checkbox/paper-checkbox.html' %}">
 
+    <link rel="import"
+    href="{% static 'bower_components/paper-menu-button/paper-menu-button.html' %}">
+
+    <link rel="import"
+    href="{% static 'bower_components/paper-menu/paper-menu.html' %}">
+
+    <link rel="import"
+    href="{% static 'bower_components/paper-item/paper-item.html' %}">
+
     <style>
         @import url({% static 'theme.css' %});
     </style>
@@ -112,8 +124,43 @@
     location.href='/signout';
   }
 
+  var todoidForDeletion=-99;
+
+  function cancelDeleteTodo() {
+      todoidForDeletion=-99;
+  }
+
+  function cancelDeleteTodoComment() {
+      todocommentidForDeletion=-99;
+  }
+
+  function deleteTodoCall(id) {
+      todoidForDeletion=id;
+      document.getElementById('deleteTodoDialog').open();
+  }
+
+  var todocommentidForDeletion=-99;
+
+  function deleteTodoCommentCall(id) {
+      todocommentidForDeletion=id;
+      document.getElementById('deleteTodoCommentDialog').open();
+  }
+
+  function deleteTodo() {
+      location.href="/deletetodo/"+todoidForDeletion;
+  }
+
+  function deleteTodoComment() {
+      location.href="/deletetodocomment/"+todocommentidForDeletion;
+  }
+
   function openSettings() {
     document.getElementById('settingsdialog').open();
+  }
+
+  function submittodocomment() {
+    document.getElementById('addTodoCommentForm').submit();
+    document.getElementById('addTodoCommentForm').addEventListener('iron-form-response', this.formResponse);
   }
 
   function toggleTodoDone(id) {
@@ -122,6 +169,19 @@
         document.getElementById('formToggleTodoDone'+id).submit();
         document.getElementById('formToggleTodoDone').addEventListener('iron-form-response', this.formResponse);
     }, 200);
+  }
+
+  function editTodo(id, title, details) {
+      document.getElementById('inputEditTodoId').value = id;
+      document.getElementById('inputEditTodoTitle').value = title;
+      document.getElementById('inputEditTodoDetails').value = details;
+      document.getElementById('editTodoDialog').open()
+      //TODO: add known designations...
+  }
+
+  function submitEditTodo() {
+      document.getElementById('edittodo').addEventListener('iron-form-response', this.formResponse);
+      document.getElementById('edittodo').submit();
   }
     </script>
 
@@ -149,10 +209,10 @@
 			<paper-button dialog-dismiss>No</paper-button>
 			<paper-button onclick="finallylogout();">Yes</paper-button>
 		  </div>
-		</paper-dialog>
+	</paper-dialog>
 
       <paper-header-panel class="flex" style="width:100%;">
-      <toolbar-element mtitle="{% if userindex %}Projects{% endif %}{% if project %}{{project.name}}{% endif %}"
+      <toolbar-element mtitle="{% if userindex %}Projects{% endif %}{% if project %}{{project.name}}{% endif %}{% if todo %}{{todo.parent_project.name}}{% endif %}"
       drawerbtn tbarposition="relative" class="paper-header" id="mtbar">
       <paper-icon-button class="middle" icon="menu" onclick="toggleDrawer()"></paper-icon-button>
       </toolbar-element>
@@ -161,6 +221,159 @@
 		<paper-drawer-panel id="drawerpanel">
 		<div main class="scrollable vertical layout center">
 
+    {% if todo or project %}
+    <!-- To_do delete dialog -->
+    <paper-dialog id="deleteTodoDialog" class="pdialog" modal>
+          <h2>Do you really want to delete this to do?</h2>
+          <div class="buttons">
+            <paper-button dialog-dismiss onclick="cancelDeleteTodo();">No</paper-button>
+            <paper-button onclick="deleteTodo();">Yes</paper-button>
+          </div>
+    </paper-dialog>
+
+    <!-- To_do edit dialog -->
+    <paper-dialog id="editTodoDialog" class="pdialog" modal>
+      <h2>New To do...</h2>
+    <form is="iron-form" id="edittodo" action="{% url 'edittodo' %}" method="POST">
+                {% csrf_token %}
+            <div class="vertical layout">
+                <paper-input class="cardcontent" label="Title" type="text" id="inputEditTodoTitle" name="title" required></paper-input>
+                <paper-textarea class="cardcontent" label="Details" type="text" id="inputEditTodoDetails" name="details" value=""></paper-textarea>
+                <input style="display: none;" name="todoid" value="-99" id="inputEditTodoId"></input>
+                <!--<paper-menu-button>
+                    <paper-button class="dropdown-trigger">Designation</paper-button>-->
+                    <div class="spacer"></div>
+                    <span class="cardcontent">Assign to:</span>
+                    <paper-menu class="cardcontent designMenu" class="dropdown-content" multi name="designations">
+                        {% for u in participants %}
+
+                            <paper-item>
+                                <span>{{u.user.user.username}}</span>
+                            </paper-item>
+
+                        {% endfor %}
+                    </paper-menu>
+                <!--</paper-menu-button>-->
+                <input style="display: none" name="parentproj" value="{{project.id}}"></input>
+            </div>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button onclick="submitEditTodo();">Confirm</paper-button>
+      </div>
+        </form>
+    </paper-dialog>
+    {% endif %}
+
+
+
+    <!-- BEGIN TO_DO COMMENTS SCREEN -->
+    {% if todo %}
+                <tweaked-card mtitle="{{todo.title}}" csize="big">
+
+                    <paper-menu-button class="cardMenuButton" horizontal-offset="35" vertical-offset="35"  horizontal-align="right">
+                        <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                        <paper-menu class="dropdown-content">
+                                <paper-item onclick="deleteTodoCall({{todo.id}})">
+                                    <span>Delete</span>
+                                </paper-item>
+                                <paper-item onclick="editTodo({{todo.id}}, '{{todo.title}}', '{{todo.details}}')" >
+                                    <span>Edit</span>
+                                </paper-item>
+                        </paper-menu>
+                    </paper-menu-button>
+
+                    <div class="horizontal layout cardcontent">
+                    <form is="iron-form" id="formToggleTodoDone{{todo.id}}" action="{% url 'toggleTodoDone' todo.id %}" method="POST">
+                        {% csrf_token %}
+                        <paper-checkbox name="todoCheckbox" {% if todo.done %}checked{% endif %} onclick="toggleTodoDone({{todo.id}})">
+
+                        <span>{{todo.details}}</span></paper-checkbox>
+                    </form></div>
+                    <div class="card-actions horizontal layout center">
+                <span class="flex"></span>
+
+                <div>
+                {% if todo.author.user == user %}
+                <iron-icon icon="bookmark" class="mbadge"></iron-icon>
+                <paper-tooltip position="left">You are the author</paper-tooltip>
+                {% else %}
+                  {% if todo.author.avatar %}
+                    <img class="microavatar" src="{{todo.author.avatar}}"></img>
+                  {% else %}
+                    <iron-icon icon="account-circle"></iron-icon>
+                  {% endif %}
+                <paper-tooltip position="left">{{todo.author.user.username}}</paper-tooltip>
+                {% endif %}
+                </div>
+                        <iron-icon icon="arrow-forward"></iron-icon>
+                            {% for d in designations %}
+                                    <div>
+                                        <div style="margin-left: 24px;"></div>
+                                        {% if d.user.avatar %}
+                                      <img class="microavatar" src="/media/{{d.user.avatar}}"></img>
+                                        {% else %}
+                                      <iron-icon icon="account-circle"></iron-icon>
+                                        {% endif %}
+                                        <paper-tooltip position="left">{{d.user.user.username}}</paper-tooltip>
+                                    </div>
+                            {% endfor %}
+                        </div>
+                </tweaked-card>
+
+                <paper-dialog id="deleteTodoCommentDialog" class="pdialog" modal>
+                      <h2>Do you really want to delete this comment?</h2>
+                      <div class="buttons">
+                        <paper-button dialog-dismiss onclick="cancelDeleteTodoComment();">No</paper-button>
+                        <paper-button onclick="deleteTodoComment();">Yes</paper-button>
+                      </div>
+                </paper-dialog>
+
+                {% for comment in commentstodolist %}
+                    <tweaked-card mtitle="" csize="big">
+
+                            {% if comment.author.user == request.user %}
+                                <paper-menu-button class="cardMenuButton" horizontal-offset="35" vertical-offset="35"  horizontal-align="right">
+                                    <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                                    <paper-menu class="dropdown-content">
+                                            <paper-item onclick="deleteTodoCommentCall({{comment.id}})">
+                                                <span>Delete</span>
+                                            </paper-item>
+                                    </paper-menu>
+                                </paper-menu-button>
+                            {% endif %}
+                        <div class="vertical layout xcardcontent">
+                            <div class="horizontal layout center">
+                                <img class="piccircle" src="
+                                    {% if comment.author.avatar %}
+                                /media/{{comment.author.avatar}}
+                                    {% else %}
+                                /media/img/defaultuserpic.png
+                                    {% endif %}
+                                "></img>
+                                <span class="commentAuthor">{{comment.author.user.username}}</span>
+                                <span class="flex"></span>
+                            </div>
+                            <div class="spacer"></div>
+                            <span>{{comment.content}}</span>
+                        </div>
+                    </tweaked-card>
+                    {% endfor %}
+
+                    <tweaked-card mtitle="Add comment" csize="big">
+
+                        <div class="vertical layout">
+                            <form is="iron-form" id="addTodoCommentForm" action="{% url 'submittodocomment' todo.id %}" method="POST">
+                                {% csrf_token %}
+                                <paper-textarea class="cardcontent" label="Content" type="text" name="content" required></paper-textarea>
+                                <div class="card-actions horizontal layout">
+                                    <paper-button onclick="submittodocomment()">Submit</paper-button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </tweaked-card>
+    {% endif %}
+    <!-- END TO_DO COMMENTS SCREEN -->
 
     <!-- BEGIN PROJECT SCREEN -->
     {% if project %}
@@ -175,9 +388,23 @@
     <form is="iron-form" id="submitnewtodo" action="{% url 'submitnewtodo' %}" method="POST">
                 {% csrf_token %}
             <div class="vertical layout">
-        <paper-input class="cardcontent" label="Title" type="text" name="title" required></paper-input>
-        <paper-textarea class="cardcontent" label="Details" type="text" name="details"></paper-textarea>
-        <input style="display: none" name="parentproj" value="{{project.id}}"></input>
+                <paper-input class="cardcontent" label="Title" type="text" name="title" required></paper-input>
+                <paper-textarea class="cardcontent" label="Details" type="text" name="details" value=""></paper-textarea>
+                <!--<paper-menu-button>
+                    <paper-button class="dropdown-trigger">Designation</paper-button>-->
+                    <div class="spacer"></div>
+                    <span class="cardcontent">Assign to:</span>
+                    <paper-menu class="cardcontent designMenu" class="dropdown-content" multi name="designations">
+                        {% for u in participants %}
+
+                            <paper-item>
+                                <span>{{u.user.user.username}}</span>
+                            </paper-item>
+
+                        {% endfor %}
+                    </paper-menu>
+                <!--</paper-menu-button>-->
+                <input style="display: none" name="parentproj" value="{{project.id}}"></input>
             </div>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
@@ -189,6 +416,19 @@
 
             {% for todo in todolist %}
                 <tweaked-card mtitle="{{todo.title}}" csize="big">
+
+                    <paper-menu-button class="cardMenuButton" horizontal-offset="35" vertical-offset="35"  horizontal-align="right">
+                        <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                        <paper-menu class="dropdown-content">
+                                <paper-item onclick="deleteTodoCall({{todo.id}})">
+                                    <span>Delete</span>
+                                </paper-item>
+                                <paper-item onclick="editTodo({{todo.id}}, '{{todo.title}}', '{{todo.details}}')" >
+                                    <span>Edit</span>
+                                </paper-item>
+                        </paper-menu>
+                    </paper-menu-button>
+
                     <div class="horizontal layout cardcontent">
                     <form is="iron-form" id="formToggleTodoDone{{todo.id}}" action="{% url 'toggleTodoDone' todo.id %}" method="POST">
                         {% csrf_token %}
@@ -197,7 +437,7 @@
                         <span>{{todo.details}}</span></paper-checkbox>
                     </form></div>
                     <div class="card-actions horizontal layout center">
-                        <paper-button onclick="">Comments</paper-button>
+                        <paper-button onclick="location.href='{% url 'todoview' todo.id %}'">Comments</paper-button>
                 <span class="flex"></span>
 
                 <div>
@@ -206,7 +446,7 @@
                 <paper-tooltip position="left">You are the author</paper-tooltip>
                 {% else %}
                   {% if todo.author.avatar %}
-                    <img class="microavatar" src="{{todo.author.avatar}}"></img>
+                    <img class="microavatar" src="/media/{{todo.author.avatar}}"></img>
                   {% else %}
                     <iron-icon icon="account-circle"></iron-icon>
                   {% endif %}
@@ -301,7 +541,11 @@
           <span class="usrname">// {{user.username}}</span>
       </div>
       <div class="topbtncont">
+            {% if todo %}
+                <paper-button class="fullbleedbtn" onclick="location.href='{% url 'projview' todo.parent_project.id %}'"><iron-icon icon="arrow-back"></iron-icon> {{todo.parent_project.name}}</paper-button>
+            {% endif %}
             <paper-button class="fullbleedbtn" onclick="location.href='/'">Projects</paper-button>
+            <paper-button class="fullbleedbtn" onclick="">(Add project settings)</paper-button>
       </div>
       <div>
         <div class="bottombtncont">

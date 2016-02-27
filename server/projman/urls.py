@@ -4,6 +4,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
+
 	url(r'^$', views.index, name='index'),
 	url(r'^signup/?', views.signup, name='signup'),
 	url(r'^signin/?', views.signin, name='signin'),
@@ -18,5 +19,13 @@ urlpatterns = [
 	url(r'^submitnewtodo/?', views.submitnewtodo, name='submitnewtodo'),
 	url(r'^toggleTodoDone/(?P<todoid>[0-9]+)/?$', views.toggletododone, name='toggleTodoDone'),
 
+	url(r'^deletetodo/(?P<todoid>[0-9]+)/?$', views.deletetodo, name='deletetodo'),
+
+	url(r'^todo/(?P<todoid>[0-9]+)/?$', views.todoview, name='todoview'),
+	url(r'^submittodocomment/(?P<todoid>[0-9]+)/?$', views.submittodocomment, name='submittodocomment'),
+	url(r'^deletetodocomment/(?P<commentid>[0-9]+)/?$', views.deletetodocomment, name='deletetodocomment'),
+
+
+	url(r'^edittodo/?', views.edittodo, name='edittodo'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) #+ static(settings.MEDIA_INCOMPLETE_URL, document_root=settings.MEDIA_ROOT)
