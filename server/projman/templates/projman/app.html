@@ -102,6 +102,16 @@
 	}
 
     function submitTodo() {
+        var menu=document.getElementById("newTodoDesignMenu").selectedItems;
+        console.log(menu);
+        var menuVals="";
+        for (i=0; i<menu.length; i++) {
+            menuVals+=menu[i].innerText+"|";
+        }
+        console.log(menuVals);
+        document.getElementById('newtodoDesignations').value=menuVals;
+
+        console.log(document.getElementById('submitnewtodo').elements);
 		document.getElementById('submitnewtodo').submit();
 	}
 
@@ -233,7 +243,7 @@
 
     <!-- To_do edit dialog -->
     <paper-dialog id="editTodoDialog" class="pdialog" modal>
-      <h2>New To do...</h2>
+      <h2>Edit To do...</h2>
     <form is="iron-form" id="edittodo" action="{% url 'edittodo' %}" method="POST">
                 {% csrf_token %}
             <div class="vertical layout">
@@ -394,17 +404,19 @@
                     <paper-button class="dropdown-trigger">Designation</paper-button>-->
                     <div class="spacer"></div>
                     <span class="cardcontent">Assign to:</span>
-                    <paper-menu class="cardcontent designMenu" class="dropdown-content" multi name="designations">
+
+                    <paper-menu class="cardcontent designMenu" class="dropdown-content" multi name="designations" id="newTodoDesignMenu">
                         {% for u in participants %}
 
-                            <paper-item>
+                            <paper-item role="menuitemcheckbox" value="{{u.user.user.username}}">
                                 <span>{{u.user.user.username}}</span>
                             </paper-item>
 
                         {% endfor %}
                     </paper-menu>
+                    <input style="display: none;" name="newtodoDesignations" id="newtodoDesignations" value=""></input>
                 <!--</paper-menu-button>-->
-                <input style="display: none" name="parentproj" value="{{project.id}}"></input>
+                <input style="display: none;" name="parentproj" value="{{project.id}}"></input>
             </div>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>

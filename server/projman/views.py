@@ -90,7 +90,11 @@ def toggletododone(request, todoid):
 	return HttpResponse("200")
 
 def submitnewtodo(request):
-	print(request.POST.get("designations"))
+	rawDesign=request.POST.get("newtodoDesignations")
+	designationsList=[]
+	if rawDesign:
+		designationsList=rawDesign[:-1].split('|')
+
 	title=request.POST.get("title")
 	details=request.POST.get("details")
 	proj= get_object_or_404(Project, id= request.POST.get("parentproj"))
@@ -98,6 +102,11 @@ def submitnewtodo(request):
 		user=get_object_or_404(ProjmanUser, user=request.user)
 		todo=To_do(title=title, details=details, author=user, parent_project=proj)
 		todo.save()
+
+		if designationsList:
+			for i in designationsList:
+				desi=Designation(user=get_object_or_404(ProjmanUser, user=get_object_or_404(User, username=i)), todo=todo)
+				desi.save()
 		#TODO: designation
 		#des=Participation(user=user, project=proj)
 		#part.save()
