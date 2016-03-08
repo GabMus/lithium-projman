@@ -7,7 +7,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 <link rel="shortcut icon" type="image/png"
-          href="{% static 'favicon.ico' %}"/><link rel="shortcut icon" type="image/png"
           href="{% static 'favicon.ico' %}"/>
           <link rel="apple-touch-icon" href="{% static 'appicon.png' %}">
     <title>Lithium // Project Manager</title>
@@ -15,13 +14,10 @@
     <script src="{% static 'bower_components/webcomponentsjs/webcomponents-lite.min.js' %}"></script>
 
     <link rel="import"
-    href="{% static 'bower_components/paper-fab/paper-fab.html' %}">
+    href="{% static 'bower_components/paper-button/paper-button.html' %}">
 
     <link rel="import"
     href="{% static 'bower_components/iron-icons/iron-icons.html' %}">
-
-    <link rel="import"
-    href="{% static 'elements/photo-card.html' %}">
 
     <link rel="import"
     href="{% static 'elements/tweaked-card.html' %}">
@@ -30,13 +26,10 @@
     href="{% static 'elements/toolbar-element.html' %}">
 
     <link rel="import"
-    href="{% static 'bower_components/iron-flex-layout/classes/iron-flex-layout.html' %}">
+    href="{% static 'bower_components/iron-flex-layout/iron-flex-layout-classes.html' %}">
 
     <link rel="import"
     href="{% static 'bower_components/iron-form/iron-form.html' %}">
-
-    <link rel="import"
-    href="{% static 'elements/share-button.html' %}">
 
   	<link rel="import"
   	href="{% static 'bower_components/paper-input/paper-input.html' %}">
@@ -44,43 +37,24 @@
   	<link rel="import"
   	href="{% static 'bower_components/paper-input/paper-textarea.html' %}">
 
+
+    <style is="custom-style" include="iron-flex iron-flex-alignment">
+      .flex-wrap {
+        @apply(--layout-horizontal);
+        @apply(--layout-wrap);
+        @apply(--layout-around-justified);
+      }
+    </style>
     <style>
         @import url({% static 'theme.css' %});
     </style>
 </head>
 
 
-	<script>
-    function opendelay(uri) {
-        setTimeout(function () {
-    location.href=uri;
-        }, 500);
-    }
-	var fixed=false;
-	function onHeaderScroll() {
-		var tabs = document.getElementById('tabsBar');
-		if (document.body.scrollTop >= 70 && !fixed) {
-			tabs.style.position = 'fixed';
-			tabs.style.top = '0px';
-			fixed=true;
-		}
-		if (document.body.scrollTop < 70 && fixed) {
-			tabs.style.position = 'relative';
-			fixed=false;
-		}
-	}
-    </script>
-
-
-
-
-<body class="fullbleed vertical layout center">
-	{% if user.is_authenticated %}
-      <toolbar-element mtitle="Lithium" lucid><span>Welcome {{user.username}} <paper-button onclick="location.href='/signout'">Sign out</paper-button></span></toolbar-element>
-	{% else %}
-      <toolbar-element mtitle="Lithium" lucid><paper-button onClick="location.href='/signin'">Log in</paper-button></toolbar-element>
-    {% endif %}
-    	<div class="welcome vertical layout center flex">
+<body>
+      <toolbar-element mtitle="Lithium" lucid><paper-button onClick="location.href='/signin'">Sign in</paper-button></toolbar-element>
+    <div class="welcome">
+    	<div class="vertical layout center">
         <div class="welcome-textbox">
           <h1>Lithium //</h1>
 
@@ -88,15 +62,57 @@
         </div>
     		<paper-button class="accentbtn bigbtn" onclick="location.href='/signup'">Sign Up</paper-button>
     	</div>
-
-      <div class="xtracontent">
-        <p>pootis</p><p>pootis</p><p>pootis</p>
-        <p>pootis</p><p>pootis</p><p>pootis</p>
-        <p>pootis</p><p>pootis</p><p>pootis</p>
-        <p>pootis</p><p>pootis</p><p>pootis</p>
-        <p>pootis</p><p>pootis</p><p>pootis</p>
-        <p>pootis</p><p>pootis</p><p>pootis</p>
-      <p>pootis</p><p>pootis</p><p>pootis</p>
-      </div>
+    </div>
+      <div class="container flex-wrap justify">
+        <tweaked-card>
+          <div class="vertical layout center xcardcontent">
+            <img src="/media/img/defaultuserpic.png" class="roundpic"></img>
+            <h2>Don't be slacking</h2>
+            <span>
+              Get your work done. Now. Oh, you need Joe to make this or that thing? Just tell him and keep on working. It's Joe's problem now.
+            </span>
+          </div>
+        </tweaked-card>
+        <tweaked-card>
+          <div class="vertical layout center xcardcontent">
+            <img src="/media/img/defaultuserpic.png" class="roundpic"></img>
+            <h2>Keep track</h2>
+            <span>
+              "Is this thing done? What do we need next? What's the roadmap? Hey Charlie, do you have the link to the cloud folder with all the documents?"<br />
+              No more. Make shared notes, update them and pin the important information on top. This way you have no excuse.
+            </span>
+          </div>
+        </tweaked-card>
+        <tweaked-card>
+          <div class="vertical layout center xcardcontent">
+            <img src="/media/img/defaultuserpic.png" class="roundpic"></img>
+            <h2>Interact</h2>
+            <span>
+              Human beings have to interact with each other. If something isn't clear, leave a comment as you'd do on your favourite social network.
+            </span>
+          </div>
+        </tweaked-card>
+        <tweaked-card>
+          <div class="vertical layout center xcardcontent">
+            <img src="/media/img/defaultuserpic.png" class="roundpic"></img>
+            <h2>One service</h2>
+            <span>
+              This is a webapp. It means it's a website, but it's optimized to be used as an actual application. No need to download anything, just go to the website on your favourite device or operating system.<br />
+              Note: if your favourite operating system isn't Linux you should rethink your priorities.
+            </span>
+          </div>
+        </tweaked-card>
+        <tweaked-card>
+          <div class="vertical layout center xcardcontent">
+            <img src="/media/img/defaultuserpic.png" class="roundpic"></img>
+            <h2>Free. As in freedom.</h2>
+            <span>
+              This software is under the GPLv3 license. This means you can use it in any way you want, and you also have access to the source code.<br />
+              You can basically do whatever you want. And you know how your data is treated.
+            </span>
+          </div>
+        </tweaked-card>
+        </div>
+        <div class="spacer"></div>
 </body>
 </html>

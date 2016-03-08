@@ -2,7 +2,7 @@
 href="/static/bower_components/polymer/polymer.html">
 
 <link rel="import"
-href="/static/bower_components/iron-flex-layout/classes/iron-flex-layout.html">
+href="/static/bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import"
 href="/static/bower_components/paper-tabs/paper-tabs.html">
@@ -27,16 +27,17 @@ href="/static/bower_components/paper-header-panel/paper-header-panel.html">
 
 <dom-module id="toolbar-element">
   {% verbatim %}
-  <template>
+<template>
+<style include="iron-flex iron-flex-alignment"></style>
 
-  <style>
+  <style is="custom-style">
   :host {
-    z-index: 20;
     width: 100%;
     --paper-toolbar-color: white;
   }
 
   #tbar {
+    z-index: 21;
     width: 100%;
     color: white;
   }

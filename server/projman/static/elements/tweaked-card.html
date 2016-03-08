@@ -2,7 +2,7 @@
       href="/static/bower_components/polymer/polymer.html">
 
 <link rel="import"
-    href="/static/bower_components/iron-flex-layout/classes/iron-flex-layout.html">
+    href="/static/bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import"
     href="/static/bower_components/paper-card/paper-card.html">
@@ -10,14 +10,14 @@
 <dom-module id="tweaked-card">
 {% verbatim %}
   <template>
+  <style include="iron-flex iron-flex-alignment"></style>
 
     <style is="custom-style">
         :host {
             margin: 24px 24px 0 24px;
-            width: 90%;
         }
     	.mCard {
-    		width:100%;
+    		width:90%;
     		min-width: 300px;
             max-width: 300px;
             color: #263238;
@@ -31,7 +31,7 @@
     </style>
     		<div class="vertical layout center flex">
                 <paper-card heading="{{mtitle}}" class="mCard">
-                    <content class="description"></content>
+                    <content></content>
                 </paper-card>
             </div>
 

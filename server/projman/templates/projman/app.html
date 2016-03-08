@@ -21,6 +21,9 @@
     href="{% static 'bower_components/iron-icons/iron-icons.html' %}">
 
     <link rel="import"
+    href="{% static 'bower_components/iron-icons/maps-icons.html' %}">
+
+    <link rel="import"
     href="{% static 'bower_components/paper-icon-button/paper-icon-button.html' %}">
 
     <link rel="import"
@@ -30,13 +33,10 @@
     href="{% static 'elements/toolbar-element.html' %}">
 
     <link rel="import"
-    href="{% static 'bower_components/iron-flex-layout/classes/iron-flex-layout.html' %}">
+    href="{% static 'bower_components/iron-flex-layout/iron-flex-layout-classes.html' %}">
 
     <link rel="import"
     href="{% static 'bower_components/iron-form/iron-form.html' %}">
-
-    <link rel="import"
-    href="{% static 'elements/share-button.html' %}">
 
   	<link rel="import"
   	href="{% static 'bower_components/paper-input/paper-input.html' %}">
@@ -60,19 +60,21 @@
     href="{% static 'bower_components/paper-header-panel/paper-header-panel.html' %}">
 
     <link rel="import"
-    href="{% static 'bower_components/file-upload/file-upload.html' %}">
-
-    <link rel="import"
     href="{% static 'bower_components/paper-checkbox/paper-checkbox.html' %}">
 
     <link rel="import"
     href="{% static 'bower_components/paper-menu-button/paper-menu-button.html' %}">
 
     <link rel="import"
+    href="{% static 'bower_components/paper-button/paper-button.html' %}">
+
+    <link rel="import"
     href="{% static 'bower_components/paper-menu/paper-menu.html' %}">
 
     <link rel="import"
     href="{% static 'bower_components/paper-item/paper-item.html' %}">
+
+    <style is="custom-style" include="iron-flex"></style>
 
     <style>
         @import url({% static 'theme.css' %});
@@ -92,28 +94,33 @@
 		document.getElementById('submitnewproj').addEventListener('iron-form-response', this.formResponse);
 	}
 
-    function addTodo() {
-        document.getElementById('addTodoDialog').open();
-        document.getElementById('submitnewtodo').addEventListener('iron-form-response', this.formResponse);
-    }
+  function addTodo() {
+      document.getElementById('addTodoDialog').open();
+      document.getElementById('submitnewtodo').addEventListener('iron-form-response', this.formResponse);
+  }
+
+  function addNote() {
+      document.getElementById('addNoteDialog').open();
+      document.getElementById('submitnewnote').addEventListener('iron-form-response', this.formResponse);
+  }
 
 	function submitProj() {
 		document.getElementById('submitnewproj').submit();
 	}
 
     function submitTodo() {
-        var menu=document.getElementById("newTodoDesignMenu").selectedItems;
-        console.log(menu);
-        var menuVals="";
-        for (i=0; i<menu.length; i++) {
-            menuVals+=menu[i].innerText+"|";
-        }
-        console.log(menuVals);
-        document.getElementById('newtodoDesignations').value=menuVals;
-
-        console.log(document.getElementById('submitnewtodo').elements);
-		document.getElementById('submitnewtodo').submit();
+      var menu=document.getElementById("newTodoDesignMenu").selectedItems;
+      var menuVals="";
+      for (i=0; i<menu.length; i++) {
+          menuVals+=menu[i].innerText+"|";
+      }
+      document.getElementById('newtodoDesignations').value=menuVals;
+	    document.getElementById('submitnewtodo').submit();
 	}
+
+  function submitNote() {
+    document.getElementById('submitnewnote').submit();
+}
 
 	function formResponse(e) {
 		location.reload();
@@ -149,11 +156,42 @@
       document.getElementById('deleteTodoDialog').open();
   }
 
+
+    var noteidForDeletion=-99;
+
+    function cancelDeleteNote() {
+        noteidForDeletion=-99;
+    }
+
+    function cancelDeleteNoteComment() {
+        notecommentidForDeletion=-99;
+    }
+
+    function deleteNoteCall(id) {
+        noteidForDeletion=id;
+        document.getElementById('deleteNoteDialog').open();
+    }
+
+    function deleteNote() {
+        location.href="/deletenote/"+noteidForDeletion;
+    }
+
   var todocommentidForDeletion=-99;
 
   function deleteTodoCommentCall(id) {
       todocommentidForDeletion=id;
       document.getElementById('deleteTodoCommentDialog').open();
+  }
+
+  var notecommentidForDeletion=-99;
+
+  function deleteNoteCommentCall(id) {
+      notecommentidForDeletion=id;
+      document.getElementById('deleteNoteCommentDialog').open();
+  }
+
+  function deleteNoteComment() {
+      location.href="/deletenotecomment/"+notecommentidForDeletion;
   }
 
   function deleteTodo() {
@@ -177,36 +215,82 @@
       //why the timeout? cause ONLY on PC, the function is run before the checkbox actually changes value, this causes it to send "false" when activated and "true" when deactivated
     setTimeout(function () {
         document.getElementById('formToggleTodoDone'+id).submit();
-        document.getElementById('formToggleTodoDone').addEventListener('iron-form-response', this.formResponse);
+        //document.getElementById('formToggleTodoDone').addEventListener('iron-form-response', this.formResponse);
     }, 200);
   }
 
-  function editTodo(id, title, details) {
+  function editTodo(id, title, details, designations) {
       document.getElementById('inputEditTodoId').value = id;
       document.getElementById('inputEditTodoTitle').value = title;
       document.getElementById('inputEditTodoDetails').value = details;
-      document.getElementById('editTodoDialog').open()
-      //TODO: add known designations...
+      document.getElementById('editTodoDialog').open();
+
+      var menu=document.getElementById('editTodoDesignationsMenu');
+
+      if (menu.selectedValues) {
+        var l=menu.selectedValues.length;
+        for (var i = 0; i < l; i++) {
+          menu.select(menu.selectedValues[0]);
+        }
+      }
+      for (var i = 0; i < designations.length; i++) {
+        var litem=document.getElementById('editTodoDesignation'+designations[i]);
+        menu.select(menu.indexOf(litem));
+      }
+  }
+
+  function editNote(id, title, content, pinned) {
+      document.getElementById('inputEditNoteId').value = id;
+      document.getElementById('inputEditNoteTitle').value = title;
+      document.getElementById('inputEditNoteContent').value = content;
+      if (pinned == 'True') {
+        document.getElementById('inputEditNotePinned').checked = true;
+      }
+      else {
+        document.getElementById('inputEditNotePinned').checked = false;
+      }
+      document.getElementById('editNoteDialog').open();
+  }
+
+  function submitEditNote() {
+    document.getElementById('editnote').addEventListener('iron-form-response', this.formResponse);
+    document.getElementById('editnote').submit();
   }
 
   function submitEditTodo() {
-      document.getElementById('edittodo').addEventListener('iron-form-response', this.formResponse);
-      document.getElementById('edittodo').submit();
+    var menu=document.getElementById('editTodoDesignationsMenu').selectedItems;
+    var menuVals="";
+    for (i=0; i<menu.length; i++) {
+      menuVals+=menu[i].innerText+"|";
+    }
+
+    document.getElementById('edittodoDesignations').value=menuVals;
+    document.getElementById('edittodo').addEventListener('iron-form-response', this.formResponse);
+    document.getElementById('edittodo').submit();
+  }
+
+  function submitnotecomment() {
+    document.getElementById('addNoteCommentForm').submit();
+    document.getElementById('addNoteCommentForm').addEventListener('iron-form-response', this.formResponse);
   }
     </script>
 
 
 
 
-<body class="fullbleed vertical layout center">
-    <!--TODO: implement settings dialog-->
+<body>
+    <!--TODO: finish implement settings dialog-->
     <paper-dialog id="settingsdialog" class="pdialog" modal>
 		  <h2>Settings</h2>
 				<div class="vertical layout">
-          <span>tkn: {{csrfmiddlewaretoken}}</span>
-          <file-upload method="POST" target="{% url 'updateavatar' %}" mcsrftoken="{{ csrf_token }}">
-            Profile picture</file-upload>
-
+          <form action="{% url 'uploadpic' %}" method="POST" enctype="multipart/form-data" id="uploadpicform">
+            {% csrf_token %}
+                <p>Change user picture</p>
+                <p>
+                    <input id="id_image" type="file" name="image"></input>
+                </p>
+                <paper-button onclick="document.getElementById('uploadpicform').submit()">Submit</paper-button>
+            </form>
  				</div>
 		  <div class="buttons">
 			<paper-button dialog-dismiss>Done</paper-button>
@@ -221,17 +305,74 @@
 		  </div>
 	</paper-dialog>
 
-      <paper-header-panel class="flex" style="width:100%;">
+		<paper-drawer-panel id="drawerpanel">
+
+      <paper-header-panel main class="flex" style="width:100%;">
       <toolbar-element mtitle="{% if userindex %}Projects{% endif %}{% if project %}{{project.name}}{% endif %}{% if todo %}{{todo.parent_project.name}}{% endif %}"
       drawerbtn tbarposition="relative" class="paper-header" id="mtbar">
       <paper-icon-button class="middle" icon="menu" onclick="toggleDrawer()"></paper-icon-button>
       </toolbar-element>
 
 
-		<paper-drawer-panel id="drawerpanel">
-		<div main class="scrollable vertical layout center">
+      {% if project %}
+        <!-- Project settings -->
 
-    {% if todo or project %}
+        <paper-dialog id="projSettingsDialog" class="pdialog" modal>
+          <h2>{{project.name}} settings</h2>
+        <form is="iron-form" id="editnote" action="" method="POST">
+                    {% csrf_token %}
+                <div class="vertical layout">
+                    <paper-input class="cardcontent" label="Title" type="text" id="" name="title" required></paper-input>
+                    <paper-textarea class="cardcontent" label="Content" type="text" id="" name="content" value=""></paper-textarea>
+                    <input style="display: none;" name="noteid" value="-99" id=""></input>
+                      <div class="spacer" style="margin-left: 24px;">
+                        <paper-checkbox name="pinned" id="">Pin on top</paper-checkbox>
+                      </div>
+                </div>
+          <div class="buttons">
+            <paper-button dialog-dismiss>Cancel</paper-button>
+            <paper-button onclick="">Confirm</paper-button>
+          </div>
+            </form>
+        </paper-dialog>
+
+
+
+      {% endif %}
+
+      {% if note or noteslist %}
+      <!-- Note delete dialog -->
+      <paper-dialog id="deleteNoteDialog" class="pdialog" modal>
+            <h2>Do you really want to delete this note?</h2>
+            <div class="buttons">
+              <paper-button dialog-dismiss onclick="cancelDeleteNote();">No</paper-button>
+              <paper-button onclick="deleteNote();">Yes</paper-button>
+            </div>
+      </paper-dialog>
+
+      <!-- Note edit dialog -->
+      <paper-dialog id="editNoteDialog" class="pdialog" modal>
+        <h2>Edit Note...</h2>
+      <form is="iron-form" id="editnote" action="{% url 'editnote' %}" method="POST">
+                  {% csrf_token %}
+              <div class="vertical layout">
+                  <paper-input class="cardcontent" label="Title" type="text" id="inputEditNoteTitle" name="title" required></paper-input>
+                  <paper-textarea class="cardcontent" label="Content" type="text" id="inputEditNoteContent" name="content" value=""></paper-textarea>
+                  <input style="display: none;" name="noteid" value="-99" id="inputEditNoteId"></input>
+                    <div class="spacer" style="margin-left: 24px;">
+                      <paper-checkbox name="pinned" id="inputEditNotePinned">Pin on top</paper-checkbox>
+                    </div>
+                  <input style="display: none" name="parentproj" value="{{project.id}}"></input>
+              </div>
+        <div class="buttons">
+          <paper-button dialog-dismiss>Cancel</paper-button>
+          <paper-button onclick="submitEditNote();">Confirm</paper-button>
+        </div>
+          </form>
+      </paper-dialog>
+      {% endif %}
+
+    {% if todo or todolist %}
     <!-- To_do delete dialog -->
     <paper-dialog id="deleteTodoDialog" class="pdialog" modal>
           <h2>Do you really want to delete this to do?</h2>
@@ -250,20 +391,18 @@
                 <paper-input class="cardcontent" label="Title" type="text" id="inputEditTodoTitle" name="title" required></paper-input>
                 <paper-textarea class="cardcontent" label="Details" type="text" id="inputEditTodoDetails" name="details" value=""></paper-textarea>
                 <input style="display: none;" name="todoid" value="-99" id="inputEditTodoId"></input>
-                <!--<paper-menu-button>
-                    <paper-button class="dropdown-trigger">Designation</paper-button>-->
                     <div class="spacer"></div>
                     <span class="cardcontent">Assign to:</span>
-                    <paper-menu class="cardcontent designMenu" class="dropdown-content" multi name="designations">
+                    <paper-menu attr-for-elected class="cardcontent designMenu" id="editTodoDesignationsMenu" class="dropdown-content" multi name="designations">
                         {% for u in participants %}
 
-                            <paper-item>
+                            <paper-item value="{{u.user.user.username}}" id="editTodoDesignation{{u.user.user.username}}">
                                 <span>{{u.user.user.username}}</span>
                             </paper-item>
 
                         {% endfor %}
                     </paper-menu>
-                <!--</paper-menu-button>-->
+                <input style="display: none;" name="edittodoDesignations" id="edittodoDesignations" value=""></input>
                 <input style="display: none" name="parentproj" value="{{project.id}}"></input>
             </div>
       <div class="buttons">
@@ -286,7 +425,7 @@
                                 <paper-item onclick="deleteTodoCall({{todo.id}})">
                                     <span>Delete</span>
                                 </paper-item>
-                                <paper-item onclick="editTodo({{todo.id}}, '{{todo.title}}', '{{todo.details}}')" >
+                                <paper-item onclick="editTodo({{todo.id}}, '{{todo.title}}', '{{todo.details}}', [{% for d in designations %}{% if d.todo == todo %}'{{d.user.user.username}}',{% endif %}{% endfor %}])" >
                                     <span>Edit</span>
                                 </paper-item>
                         </paper-menu>
@@ -386,7 +525,7 @@
     <!-- END TO_DO COMMENTS SCREEN -->
 
     <!-- BEGIN PROJECT SCREEN -->
-    {% if project %}
+    {% if todoview %}
     <div>
     <paper-fab id="addfab" icon="add" onClick="addTodo()"></paper-fab>
     <paper-tooltip for="addfab" position="left">Add Todo</paper-tooltip>
@@ -400,8 +539,6 @@
             <div class="vertical layout">
                 <paper-input class="cardcontent" label="Title" type="text" name="title" required></paper-input>
                 <paper-textarea class="cardcontent" label="Details" type="text" name="details" value=""></paper-textarea>
-                <!--<paper-menu-button>
-                    <paper-button class="dropdown-trigger">Designation</paper-button>-->
                     <div class="spacer"></div>
                     <span class="cardcontent">Assign to:</span>
 
@@ -415,7 +552,6 @@
                         {% endfor %}
                     </paper-menu>
                     <input style="display: none;" name="newtodoDesignations" id="newtodoDesignations" value=""></input>
-                <!--</paper-menu-button>-->
                 <input style="display: none;" name="parentproj" value="{{project.id}}"></input>
             </div>
       <div class="buttons">
@@ -435,7 +571,7 @@
                                 <paper-item onclick="deleteTodoCall({{todo.id}})">
                                     <span>Delete</span>
                                 </paper-item>
-                                <paper-item onclick="editTodo({{todo.id}}, '{{todo.title}}', '{{todo.details}}')" >
+                                <paper-item onclick="editTodo({{todo.id}}, '{{todo.title}}', '{{todo.details}}', [{% for d in designations %}{% if d.todo == todo %}'{{d.user.user.username}}', {% endif %}{% endfor %}])" >
                                     <span>Edit</span>
                                 </paper-item>
                         </paper-menu>
@@ -489,6 +625,187 @@
     <!-- END PROJECT SCREEN -->
 
 
+    <!-- BEGIN PROJECT NOTES SCREEN -->
+    {% if notesview %}
+    <div>
+    <paper-fab id="addfab" icon="add" onClick="addNote()"></paper-fab>
+    <paper-tooltip for="addfab" position="left">Add Note</paper-tooltip>
+    </div>
+
+
+    <paper-dialog id="addNoteDialog" class="pdialog" modal>
+      <h2>New Note...</h2>
+    <form is="iron-form" id="submitnewnote" action="{% url 'submitnewnote' %}" method="POST">
+                {% csrf_token %}
+            <div class="vertical layout">
+                <paper-input class="cardcontent" label="Title" type="text" name="title" required></paper-input>
+                <paper-textarea class="cardcontent" label="Content" type="text" name="content" value=""></paper-textarea>
+                <div class="spacer" style="margin-left: 24px;">
+                  <paper-checkbox name="pinned">Pin on top</paper-checkbox>
+                </div>
+
+                <input style="display: none;" name="parentproj" value="{{project.id}}"></input>
+            </div>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button onclick="submitNote();">Create</paper-button>
+      </div>
+        </form>
+    </paper-dialog>
+        {% if noteslist %}
+
+            {% for note in noteslist %}
+                <tweaked-card mtitle="{{note.title}}" csize="big">
+
+                    <paper-menu-button class="cardMenuButton" horizontal-offset="35" vertical-offset="35"  horizontal-align="right">
+                        <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                        <paper-menu class="dropdown-content">
+                                <paper-item onclick="deleteNoteCall({{note.id}})">
+                                    <span>Delete</span>
+                                </paper-item>
+                                <paper-item onclick="editNote({{note.id}}, '{{note.title}}', '{{note.content}}', '{{note.pinned}}')" >
+                                    <span>Edit</span>
+                                </paper-item>
+                        </paper-menu>
+                    </paper-menu-button>
+
+                    <div class="horizontal layout cardcontent">
+                        <span>{{note.content}}</span>
+                    </div>
+                    <div class="card-actions horizontal layout center">
+                        <paper-button onclick="location.href='{% url 'notecommentsview' note.id %}'">Comments</paper-button>
+                <span class="flex"></span>
+                {% if note.pinned %}
+                  <div>
+                    <iron-icon icon="maps:pin-drop" class="mbadge"></iron-icon>
+                    <paper-tooltip position="left">Pinned on top</paper-tooltip>
+                  </div>
+                {% endif %}
+
+                <div>
+                {% if note.author.user == user %}
+                <iron-icon icon="bookmark" class="mbadge"></iron-icon>
+                <paper-tooltip position="left">You are the author</paper-tooltip>
+                {% else %}
+                  {% if note.author.avatar %}
+                    <img class="microavatar" src="/media/{{note.author.avatar}}"></img>
+                  {% else %}
+                    <iron-icon icon="account-circle"></iron-icon>
+                  {% endif %}
+                <paper-tooltip position="left">{{note.author.user.username}}</paper-tooltip>
+                {% endif %}
+                </div>
+                </div>
+                </tweaked-card>
+            {% endfor %}
+        {% else %}
+            <h2>Nothing here</h2>
+        {% endif %}
+        <div class="spacerFab"></div>
+    {% endif %}
+    <!-- END PROJECT NOTES SCREEN -->
+
+
+    <!-- BEGIN NOTE COMMENTS SCREEN -->
+    {% if note %}
+                <tweaked-card mtitle="{{note.title}}" csize="big">
+
+                    <paper-menu-button class="cardMenuButton" horizontal-offset="35" vertical-offset="35"  horizontal-align="right">
+                        <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                        <paper-menu class="dropdown-content">
+                                <paper-item onclick="deleteNoteCall({{note.id}})">
+                                    <span>Delete</span>
+                                </paper-item>
+                                <paper-item onclick="editNote({{note.id}}, '{{note.title}}', '{{note.content}}', '{{note.pinned}}')" >
+                                    <span>Edit</span>
+                                </paper-item>
+                        </paper-menu>
+                    </paper-menu-button>
+
+                    <div class="horizontal layout cardcontent">
+                        <span>{{note.content}}</span>
+                    </div>
+                    <div class="card-actions horizontal layout center">
+                      <span class="flex"></span>
+
+                      {% if note.pinned %}
+                        <div>
+                          <iron-icon icon="maps:pin-drop" class="mbadge"></iron-icon>
+                          <paper-tooltip position="left">Pinned on top</paper-tooltip>
+                        </div>
+                      {% endif %}
+                      <div>
+                      {% if note.author.user == user %}
+                        <iron-icon icon="bookmark" class="mbadge"></iron-icon>
+                        <paper-tooltip position="left">You are the author</paper-tooltip>
+                      {% else %}
+                        {% if note.author.avatar %}
+                          <img class="microavatar" src="{{note.author.avatar}}"></img>
+                        {% else %}
+                          <iron-icon icon="account-circle"></iron-icon>
+                        {% endif %}
+                      <paper-tooltip position="left">{{note.author.user.username}}</paper-tooltip>
+                      {% endif %}
+                      </div>
+                    </div>
+                </tweaked-card>
+
+                <paper-dialog id="deleteNoteCommentDialog" class="pdialog" modal>
+                      <h2>Do you really want to delete this comment?</h2>
+                      <div class="buttons">
+                        <paper-button dialog-dismiss onclick="cancelDeleteNoteComment();">No</paper-button>
+                        <paper-button onclick="deleteNoteComment();">Yes</paper-button>
+                      </div>
+                </paper-dialog>
+
+                {% for comment in commentsnotelist %}
+                    <tweaked-card mtitle="" csize="big">
+
+                            {% if comment.author.user == request.user %}
+                                <paper-menu-button class="cardMenuButton" horizontal-offset="35" vertical-offset="35"  horizontal-align="right">
+                                    <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                                    <paper-menu class="dropdown-content">
+                                            <paper-item onclick="deleteNoteCommentCall({{comment.id}})">
+                                                <span>Delete</span>
+                                            </paper-item>
+                                    </paper-menu>
+                                </paper-menu-button>
+                            {% endif %}
+                        <div class="vertical layout xcardcontent">
+                            <div class="horizontal layout center">
+                                <img class="piccircle" src="
+                                    {% if comment.author.avatar %}
+                                /media/{{comment.author.avatar}}
+                                    {% else %}
+                                /media/img/defaultuserpic.png
+                                    {% endif %}
+                                "></img>
+                                <span class="commentAuthor">{{comment.author.user.username}}</span>
+                                <span class="flex"></span>
+                            </div>
+                            <div class="spacer"></div>
+                            <span>{{comment.content}}</span>
+                        </div>
+                    </tweaked-card>
+                    {% endfor %}
+
+                    <tweaked-card mtitle="Add comment" csize="big">
+
+                        <div class="vertical layout">
+                            <form is="iron-form" id="addNoteCommentForm" action="{% url 'submitnotecomment' note.id %}" method="POST">
+                                {% csrf_token %}
+                                <paper-textarea class="cardcontent" label="Content" type="text" name="content" required></paper-textarea>
+                                <div class="card-actions horizontal layout">
+                                    <paper-button onclick="submitnotecomment()">Submit</paper-button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </tweaked-card>
+    {% endif %}
+    <!-- END NOTE COMMENTS SCREEN -->
+
+
     <!-- BEGIN PROJECTS OVERVIEW -->
     {% if userindex %}
     <div>
@@ -540,8 +857,8 @@
 	{% endif %}
     {% endif %}
     <!-- END PROJECTS OVERVIEW -->
+  </paper-header-panel>
 
-	</div>
 	<div drawer id="mdrawer" class="vertical layout">
       <div class="drawerheader horizontal layout">
         {% if userpic %}
@@ -553,11 +870,17 @@
           <span class="usrname">// {{user.username}}</span>
       </div>
       <div class="topbtncont">
-            {% if todo %}
-                <paper-button class="fullbleedbtn" onclick="location.href='{% url 'projview' todo.parent_project.id %}'"><iron-icon icon="arrow-back"></iron-icon> {{todo.parent_project.name}}</paper-button>
+            {% if project %}
+            {% if not todolist %}
+                <paper-button class="fullbleedbtn" onclick="location.href='{% url 'projview' project.id %}'">To dos</paper-button>
             {% endif %}
-            <paper-button class="fullbleedbtn" onclick="location.href='/'">Projects</paper-button>
-            <paper-button class="fullbleedbtn" onclick="">(Add project settings)</paper-button>
+            {% if not noteslist %}
+                <paper-button class="fullbleedbtn" onclick="location.href='{% url 'notesview' project.id %}'">Notes</paper-button>
+            {% endif %}
+                <paper-button class="fullbleedbtn" onclick="location.href='/'">Projects</paper-button>
+                <paper-button class="fullbleedbtn" onclick="document.getElementById('projSettingsDialog').open()">Project settings</paper-button>
+            {% else %}
+            {% endif %}
       </div>
       <div>
         <div class="bottombtncont">
@@ -566,7 +889,7 @@
         </div>
       </div>
   </div>
+
 		</paper-drawer-panel>
-    </paper-header-panel>
 </body>
 </html>

@@ -70,3 +70,6 @@ class Participation(models.Model):
 class Designation(models.Model):
 	user=models.ForeignKey('ProjmanUser', null=False)
 	todo=models.ForeignKey('To_do', null=False)
+
+	def __str__(self):
+		return self.user.user.username + " -> " + self.todo.title
