@@ -6,6 +6,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django import forms
 from django.core.mail import send_mail
+from django.conf import settings
+import time
+import hashlib
+from smtplib import SMTPException
+
+EMAIL_SUBJECT_HEADER="Lithium Projman: "
+EMAIL_INVITE_SUBJECT=" invited you to join his project!"
 
 def get_or_none(model, *args, **kwargs):
 	try:
@@ -313,6 +320,94 @@ def userpicupload(request):
 	else:
 		return HttpResponse('403: forbidden')
 
-def sendmail(request):
-	send_mail('Subject here', 'Here is the message.', 'emaildigabry@gmail.com', ['fedev93@gmail.com'], fail_silently=False)
-	return HttpResponse('200')
+def sendemail(subject, message, to):
+	try:
+		send_mail(subject, message, settings.EMAIL_HOST_USER, [to], fail_silently=False)
+		return True
+	except SMTPException:
+		return False
+
+def sendinvite(request):
+	email=request.POST.get('invitemail')
+	projid=request.POST.get('projid')
+	proj=get_object_or_404(Project, id=projid)
+	tstamp=int(time.time())
+	unccode=str(tstamp)+str(projid)
+	unccode=unccode.encode()
+	code=hashlib.sha256(unccode).hexdigest()
+	pcode=Projcode(project=proj, code=code)
+	pcode.save()
+	baseurl=request.META['HTTP_HOST']
+	url='http://'+baseurl+'/getinvite/'+email+'/'+code
+	subj=EMAIL_SUBJECT_HEADER+request.user.username+EMAIL_INVITE_SUBJECT
+	message=request.user.username+" (email: "+request.user.email+") invited you to join his project "+proj.name+" on Lithium Projman.\nClick on the link below to join "+request.user.username+" now!\n"+url
+	result=sendemail(subj, message, email)
+	if result:
+		return HttpResponse('200')
+	else:
+		return HttpResponse('400')
+
+def submitinvitesignup(request):
+	username=request.POST.get("username")
+	email=request.POST.get("email")
+	password=request.POST.get("password")
+	projcode=request.POST.get("pcode")
+	projcodeobj=get_object_or_404(Projcode, code=projcode)
+	proj=projcodeobj.project
+	if username and email and password and proj:
+		User.objects.create_user(username=username, email=email, password=password)
+		u=get_object_or_404(User, username=username)
+		pu=get_object_or_404(ProjmanUser, user=u)
+		part=Participation(user=pu, project=proj)
+		part.save()
+		projcodeobj.delete()
+		return redirect('/signin')
+	return HttpResponse('403')
+
+
+def getinvite(request, email, projcode):
+	user=get_or_none(User, email=email)
+	puser=get_or_none(ProjmanUser, user=user)
+	if puser:
+		projcodeobj=get_object_or_404(Projcode, code=projcode)
+		proj=projcodeobj.project
+		part=Participation(user=puser, project=proj)
+		part.save()
+		projcodeobj.delete()
+		return redirect('/')
+	else:
+		context = {'invite': True, 'invitemail': email, 'pcode': projcode}
+		return render(request, 'projman/signup.html', context)
+
+def deleteproject(request):
+	projid=request.POST.get('projid')
+	if request.POST.get('iamsure'):
+		project=get_object_or_404(Project, id=projid)
+		participationslist=Participation.objects.filter(project=project)
+		noteslist=Note.objects.filter(parent_project=project)
+		todolist=To_do.objects.filter(parent_project=project)
+		tcommlist= []
+		ncommlist= []
+		for i in noteslist:
+			ncomms=Comment_note.objects.filter(parent_note=i)
+			for j in ncomms:
+				ncommlist.append(j)
+		for i in todolist:
+			tcomms=Comment_todo.objects.filter(parent_todo=i)
+			for j in tcomms:
+				tcommlist.append(j)
+		#begin deletion
+		for i in tcommlist:
+			i.delete()
+		for i in ncommlist:
+			i.delete()
+		for i in todolist:
+			i.delete()
+		for i in noteslist:
+			i.delete()
+		for i in participationslist:
+			i.delete()
+		project.delete()
+		return HttpResponse('200')
+	else:
+		return HttpResponse('400')

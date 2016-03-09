@@ -66,6 +66,8 @@ class Participation(models.Model):
 	user=models.ForeignKey('ProjmanUser', null=False)
 	project=models.ForeignKey('Project', null=False)
 
+	def __str__(self):
+		return self.user.user.username + " -> " + self.project.name
 
 class Designation(models.Model):
 	user=models.ForeignKey('ProjmanUser', null=False)
@@ -73,3 +75,10 @@ class Designation(models.Model):
 
 	def __str__(self):
 		return self.user.user.username + " -> " + self.todo.title
+
+class Projcode(models.Model):
+	project=models.ForeignKey('Project', null=False)
+	code=models.TextField(null=False, blank=False)
+
+	def __str__(self):
+		return self.project.name

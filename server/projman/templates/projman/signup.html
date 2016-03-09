@@ -81,13 +81,17 @@
 		</div>
         </toolbar-element>
 
-    <form is="iron-form" id="signupform" action="{% url 'submitsignup' %}" method="POST">
+    <form is="iron-form" id="signupform" action="{% if invite %}{% url 'submitinvitesignup' %}{% else %}{% url 'submitsignup' %}{% endif %}" method="POST">
      {% csrf_token %}
      <tweaked-card mtitle="Sign Up">
  		<div class="vertical layout">
  			<paper-input class="cardcontent" label="Username" type="text" name="username" required></paper-input>
- 			<paper-input class="cardcontent" label="Email" type="text" name="email" required></paper-input>
+ 			<paper-input class="cardcontent" label="Email" type="text" name="email" required {% if invite %}value="{{invitemail}}" disabled{% endif %}></paper-input>
  			<paper-input class="cardcontent" label="Password" type="password" name="password" required></paper-input>
+      {% if invite %}
+          <input style="display: none;" name="email" value="{{invitemail}}"></input>
+          <input style="display: none;" name="pcode" value="{{pcode}}"></input>
+      {% endif %}
  		</div>
  		<div class="card-actions">
  			<paper-button onclick="document.getElementById('signupform').submit();">Submit</paper-button></paper-card>

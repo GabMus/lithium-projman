@@ -10,6 +10,7 @@ urlpatterns = [
 	url(r'^signin/?', views.signin, name='signin'),
 	url(r'^submitsignin/?', views.submitsignin, name='submitsignin'),
 	url(r'^submitsignup/?', views.submitsignup, name='submitsignup'),
+	url(r'^submitinvitesignup/?', views.submitinvitesignup, name='submitinvitesignup'),
 	url(r'^signout/?', views.signout, name='signout'),
 
 	url(r'^submitnewproj/?', views.submitnewproj, name='submitnewproj'),
@@ -39,6 +40,8 @@ urlpatterns = [
 
 	url(r'^uploadpic/?', views.userpicupload, name='uploadpic'),
 
-	url(r'^sendmail/?', views.sendmail, name='sendmail')
+	url(r'^sendinvite/?$', views.sendinvite, name='sendinvite'),
+	url(r'^getinvite/(?P<email>[^@]+@[^@]+\.[^@]+)/(?P<projcode>.+)/?$', views.getinvite, name='getinvite'),
+	url(r'^deleteproject/?$', views.deleteproject, name='deleteproject'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) #+ static(settings.MEDIA_INCOMPLETE_URL, document_root=settings.MEDIA_ROOT)

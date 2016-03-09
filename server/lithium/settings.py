@@ -13,6 +13,16 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 from . import email
 
+
+#Before starting the project, create a file called email.py inside the
+#lithium folder and insert there your email smtp data, to send emails.
+#The structure of the email.py file is the following:
+#EMAIL_HOST="smtp.server.com"
+#EMAIL_PORT=465
+#EMAIL_HOST_USER="myemail@example.com"
+#EMAIL_HOST_PASSWORD="my password"
+#EMAIL_USE_SSL=True
+
 EMAIL_HOST=email.EMAIL_HOST
 EMAIL_PORT=email.EMAIL_PORT
 EMAIL_HOST_USER=email.EMAIL_HOST_USER

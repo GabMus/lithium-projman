@@ -36,6 +36,9 @@
     href="{% static 'bower_components/iron-flex-layout/iron-flex-layout-classes.html' %}">
 
     <link rel="import"
+    href="{% static 'bower_components/paper-spinner/paper-spinner.html' %}">
+
+    <link rel="import"
     href="{% static 'bower_components/iron-form/iron-form.html' %}">
 
   	<link rel="import"
@@ -217,6 +220,7 @@
         document.getElementById('formToggleTodoDone'+id).submit();
         //document.getElementById('formToggleTodoDone').addEventListener('iron-form-response', this.formResponse);
     }, 200);
+
   }
 
   function editTodo(id, title, details, designations) {
@@ -273,6 +277,18 @@
     document.getElementById('addNoteCommentForm').submit();
     document.getElementById('addNoteCommentForm').addEventListener('iron-form-response', this.formResponse);
   }
+
+  function sendinvitationResponse() {
+    document.getElementById('invitationspinner').active=false;
+    document.getElementById('invitationspinnericondone').hidden=false;
+  }
+
+  function submitInvitation() {
+    document.getElementById('invitationspinnericondone').hidden=true;
+    document.getElementById('invitationspinner').active=true;
+    document.getElementById('sendinvitation').addEventListener('iron-form-response', this.sendinvitationResponse)
+    document.getElementById('sendinvitation').submit()
+  }
     </script>
 
 
@@ -319,24 +335,46 @@
 
         <paper-dialog id="projSettingsDialog" class="pdialog" modal>
           <h2>{{project.name}} settings</h2>
-        <form is="iron-form" id="editnote" action="" method="POST">
+        <form is="iron-form" id="sendinvitation" action="{% url 'sendinvite' %}" method="POST">
                     {% csrf_token %}
                 <div class="vertical layout">
-                    <paper-input class="cardcontent" label="Title" type="text" id="" name="title" required></paper-input>
-                    <paper-textarea class="cardcontent" label="Content" type="text" id="" name="content" value=""></paper-textarea>
-                    <input style="display: none;" name="noteid" value="-99" id=""></input>
-                      <div class="spacer" style="margin-left: 24px;">
-                        <paper-checkbox name="pinned" id="">Pin on top</paper-checkbox>
-                      </div>
+                    <span>Invite someone to {{project.name}}</span>
+                    <paper-input class="cardcontent" label="Email" type="text" id="" name="invitemail" required></paper-input>
+                    <input style="display: none;" name="projid" value="{{project.id}}"></input>
+                    <div class="horizontal container center-justified">
+                      <paper-button onclick="submitInvitation()">Send invitation</paper-button>
+                      <paper-spinner id="invitationspinner"></paper-spinner>
+                      <iron-icon icon="done" hidden id="invitationspinnericondone"></iron-icon>
+                    </div>
                 </div>
+        </form>
+        {% if project.author.user == request.user %}
+        <div class="vertical layout">
+          <paper-button style="color: red; font-weight: bold;" onclick="document.getElementById('deleteProjectAreyousure').open();" dialog-dismiss>Delete this project</paper-button>
+        </div>
+        {% endif %}
           <div class="buttons">
-            <paper-button dialog-dismiss>Cancel</paper-button>
-            <paper-button onclick="">Confirm</paper-button>
+            <paper-button dialog-dismiss>Done</paper-button>
           </div>
-            </form>
         </paper-dialog>
 
-
+        {% if project.author.user == request.user %}
+        <paper-dialog id="deleteProjectAreyousure" class="pdialog" modal>
+          <h2>Are you sure you want to delete this project?</h2>
+          <h2>EVERYTHING inside it will be GONE FOREVER!</h2>
+        <form is="iron-form" id="deleteprojectform" action="{% url 'deleteproject' %}" method="POST">
+                    {% csrf_token %}
+                <div class="vertical layout">
+                    <paper-checkbox class="cardcontent" name="iamsure">Yes, I am sure</paper-checkbox>
+                    <input style="display: none;" name="projid" value="{{project.id}}"></input>
+                </div>
+        </form>
+          <div class="buttons">
+            <paper-button dialog-dismiss>Cancel</paper-button>
+            <paper-button style="color: red;" onclick="document.getElementById('deleteprojectform').addEventListener('iron-form-response', function() { location.href='/';}); document.getElementById('deleteprojectform').submit();">Confirm deletion</paper-button>
+          </div>
+        </paper-dialog>
+        {% endif %}
 
       {% endif %}
 
