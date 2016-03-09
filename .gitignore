@@ -1,2 +1,2 @@
 server/lithium/email.py
-server/lithium/__pycache__/*
+server/lithium/__pycache__/
