@@ -115,7 +115,7 @@ body {
 }
 
 #mdrawer {
-	border: 1px solid #CDCDCD;
+	border-right: 1px solid #CDCDCD;
   z-index: 24;
 }
 

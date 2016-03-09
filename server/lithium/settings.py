@@ -11,6 +11,16 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+from . import email
+
+EMAIL_HOST=email.EMAIL_HOST
+EMAIL_PORT=email.EMAIL_PORT
+EMAIL_HOST_USER=email.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD=email.EMAIL_HOST_PASSWORD
+EMAIL_USE_SSL=email.EMAIL_USE_SSL
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

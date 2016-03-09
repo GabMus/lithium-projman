@@ -5,6 +5,7 @@ from .models import *
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django import forms
+from django.core.mail import send_mail
 
 def get_or_none(model, *args, **kwargs):
 	try:
@@ -311,3 +312,7 @@ def userpicupload(request):
 		return redirect('/')
 	else:
 		return HttpResponse('403: forbidden')
+
+def sendmail(request):
+	send_mail('Subject here', 'Here is the message.', 'emaildigabry@gmail.com', ['fedev93@gmail.com'], fail_silently=False)
+	return HttpResponse('200')
