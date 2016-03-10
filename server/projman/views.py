@@ -110,6 +110,7 @@ def submitnewtodo(request):
 
 	title=request.POST.get("title")
 	details=request.POST.get("details")
+	print(rawDesign)
 	proj= get_object_or_404(Project, id= request.POST.get("parentproj"))
 	if request and not request.user.is_anonymous() and title:
 		user=get_object_or_404(ProjmanUser, user=request.user)

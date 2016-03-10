@@ -82,218 +82,214 @@
     <style>
         @import url({% static 'theme.css' %});
     </style>
-</head>
 
+    <script>
+      function opendelay(uri) {
+          setTimeout(function () {
+      location.href=uri;
+          }, 500);
+      }
 
-	<script>
-    function opendelay(uri) {
-        setTimeout(function () {
-    location.href=uri;
-        }, 500);
+    function addProject() {
+      document.getElementById('newprojdialog').open();
+      document.getElementById('submitnewproj').addEventListener('iron-form-response', this.formResponse);
     }
 
-	function addProject() {
-		document.getElementById('newprojdialog').open();
-		document.getElementById('submitnewproj').addEventListener('iron-form-response', this.formResponse);
-	}
+    function addTodo() {
+        document.getElementById('addTodoDialog').open();
+        document.getElementById('submitnewtodo').addEventListener('iron-form-response', this.formResponse);
+    }
 
-  function addTodo() {
-      document.getElementById('addTodoDialog').open();
-      document.getElementById('submitnewtodo').addEventListener('iron-form-response', this.formResponse);
-  }
+    function addNote() {
+        document.getElementById('addNoteDialog').open();
+        document.getElementById('submitnewnote').addEventListener('iron-form-response', this.formResponse);
+    }
 
-  function addNote() {
-      document.getElementById('addNoteDialog').open();
-      document.getElementById('submitnewnote').addEventListener('iron-form-response', this.formResponse);
-  }
+    function submitProj() {
+      document.getElementById('submitnewproj').submit();
+    }
 
-	function submitProj() {
-		document.getElementById('submitnewproj').submit();
-	}
+      function submitTodo() {
+        var menu=document.getElementById("newTodoDesignMenu").selectedItems;
+        var menuVals="";
+        for (i=0; i<menu.length; i++) {
+            menuVals+=menu[i].getAttribute('value')+"|";
+        }
+        document.getElementById('newtodoDesignations').value=menuVals;
+        document.getElementById('submitnewtodo').submit();
+    }
 
-    function submitTodo() {
-      var menu=document.getElementById("newTodoDesignMenu").selectedItems;
+    function submitNote() {
+      document.getElementById('submitnewnote').submit();
+    }
+
+    function formResponse(e) {
+      location.reload();
+    }
+
+    function toggleDrawer() {
+      var drw=document.getElementById('drawerpanel');
+      var tbar=document.getElementById('mtbar');
+      drw.togglePanel();
+      tbar.drawerbtn=false;
+      if (drw.narrow) tbar.drawerbtn=true;
+    }
+
+    function signout() {
+      document.getElementById('signoutdialog').open();
+    }
+    function finallylogout() {
+      location.href='/signout';
+    }
+
+    var todoidForDeletion=-99;
+
+    function cancelDeleteTodo() {
+        todoidForDeletion=-99;
+    }
+
+    function cancelDeleteTodoComment() {
+        todocommentidForDeletion=-99;
+    }
+
+    function deleteTodoCall(id) {
+        todoidForDeletion=id;
+        document.getElementById('deleteTodoDialog').open();
+    }
+
+
+      var noteidForDeletion=-99;
+
+      function cancelDeleteNote() {
+          noteidForDeletion=-99;
+      }
+
+      function cancelDeleteNoteComment() {
+          notecommentidForDeletion=-99;
+      }
+
+      function deleteNoteCall(id) {
+          noteidForDeletion=id;
+          document.getElementById('deleteNoteDialog').open();
+      }
+
+      function deleteNote() {
+          location.href="/deletenote/"+noteidForDeletion;
+      }
+
+    var todocommentidForDeletion=-99;
+
+    function deleteTodoCommentCall(id) {
+        todocommentidForDeletion=id;
+        document.getElementById('deleteTodoCommentDialog').open();
+    }
+
+    var notecommentidForDeletion=-99;
+
+    function deleteNoteCommentCall(id) {
+        notecommentidForDeletion=id;
+        document.getElementById('deleteNoteCommentDialog').open();
+    }
+
+    function deleteNoteComment() {
+        location.href="/deletenotecomment/"+notecommentidForDeletion;
+    }
+
+    function deleteTodo() {
+        location.href="/deletetodo/"+todoidForDeletion;
+    }
+
+    function deleteTodoComment() {
+        location.href="/deletetodocomment/"+todocommentidForDeletion;
+    }
+
+    function openSettings() {
+      document.getElementById('settingsdialog').open();
+    }
+
+    function submittodocomment() {
+      document.getElementById('addTodoCommentForm').submit();
+      document.getElementById('addTodoCommentForm').addEventListener('iron-form-response', this.formResponse);
+    }
+
+    function toggleTodoDone(id) {
+        //why the timeout? cause ONLY on PC, the function is run before the checkbox actually changes value, this causes it to send "false" when activated and "true" when deactivated
+      setTimeout(function () {
+          document.getElementById('formToggleTodoDone'+id).submit();
+          //document.getElementById('formToggleTodoDone').addEventListener('iron-form-response', this.formResponse);
+      }, 200);
+
+    }
+
+    function editTodo(id, title, details, designations) {
+        document.getElementById('inputEditTodoId').value = id;
+        document.getElementById('inputEditTodoTitle').value = title;
+        document.getElementById('inputEditTodoDetails').value = details;
+        document.getElementById('editTodoDialog').open();
+
+        var menu=document.getElementById('editTodoDesignationsMenu');
+
+        if (menu.selectedValues) {
+          var l=menu.selectedValues.length;
+          for (var i = 0; i < l; i++) {
+            menu.select(menu.selectedValues[0]);
+          }
+        }
+        for (var i = 0; i < designations.length; i++) {
+          var litem=document.getElementById('editTodoDesignation'+designations[i]);
+          menu.select(menu.indexOf(litem));
+        }
+    }
+
+    function editNote(id, title, content, pinned) {
+        document.getElementById('inputEditNoteId').value = id;
+        document.getElementById('inputEditNoteTitle').value = title;
+        document.getElementById('inputEditNoteContent').value = content;
+        if (pinned == 'True') {
+          document.getElementById('inputEditNotePinned').checked = true;
+        }
+        else {
+          document.getElementById('inputEditNotePinned').checked = false;
+        }
+        document.getElementById('editNoteDialog').open();
+    }
+
+    function submitEditNote() {
+      document.getElementById('editnote').addEventListener('iron-form-response', this.formResponse);
+      document.getElementById('editnote').submit();
+    }
+
+    function submitEditTodo() {
+      var menu=document.getElementById('editTodoDesignationsMenu').selectedItems;
       var menuVals="";
       for (i=0; i<menu.length; i++) {
-          menuVals+=menu[i].innerText+"|";
+        menuVals+=menu[i].getAttribute('value')+"|";
       }
-      document.getElementById('newtodoDesignations').value=menuVals;
-	    document.getElementById('submitnewtodo').submit();
-	}
 
-  function submitNote() {
-    document.getElementById('submitnewnote').submit();
-}
-
-	function formResponse(e) {
-		location.reload();
-	}
-
-  function toggleDrawer() {
-    var drw=document.getElementById('drawerpanel');
-    var tbar=document.getElementById('mtbar');
-    drw.togglePanel();
-    tbar.drawerbtn=false;
-    if (drw.narrow) tbar.drawerbtn=true;
-  }
-
-  function signout() {
-    document.getElementById('signoutdialog').open();
-  }
-  function finallylogout() {
-    location.href='/signout';
-  }
-
-  var todoidForDeletion=-99;
-
-  function cancelDeleteTodo() {
-      todoidForDeletion=-99;
-  }
-
-  function cancelDeleteTodoComment() {
-      todocommentidForDeletion=-99;
-  }
-
-  function deleteTodoCall(id) {
-      todoidForDeletion=id;
-      document.getElementById('deleteTodoDialog').open();
-  }
-
-
-    var noteidForDeletion=-99;
-
-    function cancelDeleteNote() {
-        noteidForDeletion=-99;
+      document.getElementById('edittodoDesignations').value=menuVals;
+      document.getElementById('edittodo').addEventListener('iron-form-response', this.formResponse);
+      document.getElementById('edittodo').submit();
     }
 
-    function cancelDeleteNoteComment() {
-        notecommentidForDeletion=-99;
+    function submitnotecomment() {
+      document.getElementById('addNoteCommentForm').submit();
+      document.getElementById('addNoteCommentForm').addEventListener('iron-form-response', this.formResponse);
     }
 
-    function deleteNoteCall(id) {
-        noteidForDeletion=id;
-        document.getElementById('deleteNoteDialog').open();
+    function sendinvitationResponse() {
+      document.getElementById('invitationspinner').active=false;
+      document.getElementById('invitationspinnericondone').hidden=false;
     }
 
-    function deleteNote() {
-        location.href="/deletenote/"+noteidForDeletion;
+    function submitInvitation() {
+      document.getElementById('invitationspinnericondone').hidden=true;
+      document.getElementById('invitationspinner').active=true;
+      document.getElementById('sendinvitation').addEventListener('iron-form-response', this.sendinvitationResponse)
+      document.getElementById('sendinvitation').submit()
     }
+      </script>
 
-  var todocommentidForDeletion=-99;
-
-  function deleteTodoCommentCall(id) {
-      todocommentidForDeletion=id;
-      document.getElementById('deleteTodoCommentDialog').open();
-  }
-
-  var notecommentidForDeletion=-99;
-
-  function deleteNoteCommentCall(id) {
-      notecommentidForDeletion=id;
-      document.getElementById('deleteNoteCommentDialog').open();
-  }
-
-  function deleteNoteComment() {
-      location.href="/deletenotecomment/"+notecommentidForDeletion;
-  }
-
-  function deleteTodo() {
-      location.href="/deletetodo/"+todoidForDeletion;
-  }
-
-  function deleteTodoComment() {
-      location.href="/deletetodocomment/"+todocommentidForDeletion;
-  }
-
-  function openSettings() {
-    document.getElementById('settingsdialog').open();
-  }
-
-  function submittodocomment() {
-    document.getElementById('addTodoCommentForm').submit();
-    document.getElementById('addTodoCommentForm').addEventListener('iron-form-response', this.formResponse);
-  }
-
-  function toggleTodoDone(id) {
-      //why the timeout? cause ONLY on PC, the function is run before the checkbox actually changes value, this causes it to send "false" when activated and "true" when deactivated
-    setTimeout(function () {
-        document.getElementById('formToggleTodoDone'+id).submit();
-        //document.getElementById('formToggleTodoDone').addEventListener('iron-form-response', this.formResponse);
-    }, 200);
-
-  }
-
-  function editTodo(id, title, details, designations) {
-      document.getElementById('inputEditTodoId').value = id;
-      document.getElementById('inputEditTodoTitle').value = title;
-      document.getElementById('inputEditTodoDetails').value = details;
-      document.getElementById('editTodoDialog').open();
-
-      var menu=document.getElementById('editTodoDesignationsMenu');
-
-      if (menu.selectedValues) {
-        var l=menu.selectedValues.length;
-        for (var i = 0; i < l; i++) {
-          menu.select(menu.selectedValues[0]);
-        }
-      }
-      for (var i = 0; i < designations.length; i++) {
-        var litem=document.getElementById('editTodoDesignation'+designations[i]);
-        menu.select(menu.indexOf(litem));
-      }
-  }
-
-  function editNote(id, title, content, pinned) {
-      document.getElementById('inputEditNoteId').value = id;
-      document.getElementById('inputEditNoteTitle').value = title;
-      document.getElementById('inputEditNoteContent').value = content;
-      if (pinned == 'True') {
-        document.getElementById('inputEditNotePinned').checked = true;
-      }
-      else {
-        document.getElementById('inputEditNotePinned').checked = false;
-      }
-      document.getElementById('editNoteDialog').open();
-  }
-
-  function submitEditNote() {
-    document.getElementById('editnote').addEventListener('iron-form-response', this.formResponse);
-    document.getElementById('editnote').submit();
-  }
-
-  function submitEditTodo() {
-    var menu=document.getElementById('editTodoDesignationsMenu').selectedItems;
-    var menuVals="";
-    for (i=0; i<menu.length; i++) {
-      menuVals+=menu[i].innerText+"|";
-    }
-
-    document.getElementById('edittodoDesignations').value=menuVals;
-    document.getElementById('edittodo').addEventListener('iron-form-response', this.formResponse);
-    document.getElementById('edittodo').submit();
-  }
-
-  function submitnotecomment() {
-    document.getElementById('addNoteCommentForm').submit();
-    document.getElementById('addNoteCommentForm').addEventListener('iron-form-response', this.formResponse);
-  }
-
-  function sendinvitationResponse() {
-    document.getElementById('invitationspinner').active=false;
-    document.getElementById('invitationspinnericondone').hidden=false;
-  }
-
-  function submitInvitation() {
-    document.getElementById('invitationspinnericondone').hidden=true;
-    document.getElementById('invitationspinner').active=true;
-    document.getElementById('sendinvitation').addEventListener('iron-form-response', this.sendinvitationResponse)
-    document.getElementById('sendinvitation').submit()
-  }
-    </script>
-
-
-
-
+</head>
 <body>
     <!--TODO: finish implement settings dialog-->
     <paper-dialog id="settingsdialog" class="pdialog" modal>
@@ -303,7 +299,7 @@
             {% csrf_token %}
                 <p>Change user picture</p>
                 <p>
-                    <input id="id_image" type="file" name="image"></input>
+                    <input id="id_image" type="file" name="image">
                 </p>
                 <paper-button onclick="document.getElementById('uploadpicform').submit()">Submit</paper-button>
             </form>
@@ -340,7 +336,7 @@
                 <div class="vertical layout">
                     <span>Invite someone to {{project.name}}</span>
                     <paper-input class="cardcontent" label="Email" type="text" id="" name="invitemail" required></paper-input>
-                    <input style="display: none;" name="projid" value="{{project.id}}"></input>
+                    <input style="display: none;" name="projid" value="{{project.id}}">
                     <div class="horizontal container center-justified">
                       <paper-button onclick="submitInvitation()">Send invitation</paper-button>
                       <paper-spinner id="invitationspinner"></paper-spinner>
@@ -366,7 +362,7 @@
                     {% csrf_token %}
                 <div class="vertical layout">
                     <paper-checkbox class="cardcontent" name="iamsure">Yes, I am sure</paper-checkbox>
-                    <input style="display: none;" name="projid" value="{{project.id}}"></input>
+                    <input style="display: none;" name="projid" value="{{project.id}}">
                 </div>
         </form>
           <div class="buttons">
@@ -396,11 +392,11 @@
               <div class="vertical layout">
                   <paper-input class="cardcontent" label="Title" type="text" id="inputEditNoteTitle" name="title" required></paper-input>
                   <paper-textarea class="cardcontent" label="Content" type="text" id="inputEditNoteContent" name="content" value=""></paper-textarea>
-                  <input style="display: none;" name="noteid" value="-99" id="inputEditNoteId"></input>
+                  <input style="display: none;" name="noteid" value="-99" id="inputEditNoteId">
                     <div class="spacer" style="margin-left: 24px;">
                       <paper-checkbox name="pinned" id="inputEditNotePinned">Pin on top</paper-checkbox>
                     </div>
-                  <input style="display: none" name="parentproj" value="{{project.id}}"></input>
+                  <input style="display: none" name="parentproj" value="{{project.id}}">
               </div>
         <div class="buttons">
           <paper-button dialog-dismiss>Cancel</paper-button>
@@ -428,10 +424,10 @@
             <div class="vertical layout">
                 <paper-input class="cardcontent" label="Title" type="text" id="inputEditTodoTitle" name="title" required></paper-input>
                 <paper-textarea class="cardcontent" label="Details" type="text" id="inputEditTodoDetails" name="details" value=""></paper-textarea>
-                <input style="display: none;" name="todoid" value="-99" id="inputEditTodoId"></input>
+                <input style="display: none;" name="todoid" value="-99" id="inputEditTodoId">
                     <div class="spacer"></div>
                     <span class="cardcontent">Assign to:</span>
-                    <paper-menu attr-for-elected class="cardcontent designMenu" id="editTodoDesignationsMenu" class="dropdown-content" multi name="designations">
+                    <paper-menu attr-for-elected class="cardcontent designMenu" id="editTodoDesignationsMenu" multi name="designations">
                         {% for u in participants %}
 
                             <paper-item value="{{u.user.user.username}}" id="editTodoDesignation{{u.user.user.username}}">
@@ -440,8 +436,8 @@
 
                         {% endfor %}
                     </paper-menu>
-                <input style="display: none;" name="edittodoDesignations" id="edittodoDesignations" value=""></input>
-                <input style="display: none" name="parentproj" value="{{project.id}}"></input>
+                <input style="display: none;" name="edittodoDesignations" id="edittodoDesignations" value="">
+                <input style="display: none" name="parentproj" value="{{project.id}}">
             </div>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
@@ -580,7 +576,7 @@
                     <div class="spacer"></div>
                     <span class="cardcontent">Assign to:</span>
 
-                    <paper-menu class="cardcontent designMenu" class="dropdown-content" multi name="designations" id="newTodoDesignMenu">
+                    <paper-menu class="cardcontent designMenu" multi name="designations" id="newTodoDesignMenu">
                         {% for u in participants %}
 
                             <paper-item role="menuitemcheckbox" value="{{u.user.user.username}}">
@@ -589,8 +585,8 @@
 
                         {% endfor %}
                     </paper-menu>
-                    <input style="display: none;" name="newtodoDesignations" id="newtodoDesignations" value=""></input>
-                <input style="display: none;" name="parentproj" value="{{project.id}}"></input>
+                    <input style="display: none;" name="newtodoDesignations" id="newtodoDesignations" value="">
+                <input style="display: none;" name="parentproj" value="{{project.id}}">
             </div>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
@@ -682,7 +678,7 @@
                   <paper-checkbox name="pinned">Pin on top</paper-checkbox>
                 </div>
 
-                <input style="display: none;" name="parentproj" value="{{project.id}}"></input>
+                <input style="display: none;" name="parentproj" value="{{project.id}}">
             </div>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
