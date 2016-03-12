@@ -211,13 +211,14 @@ def projview(request, projid):
 		todolist=To_do.objects.filter(parent_project=project).order_by('done')
 		particip=Participation.objects.filter(project=project)
 		designations=[]
+		pinnednotes=Note.objects.filter(parent_project=project, pinned=True)
 		for i in todolist:
 			d=Designation.objects.filter(todo=i)
 			for j in d:
 				designations.append(j)
 
 		userpic=puser.avatar
-		context= {'project': project, 'todolist': todolist, 'userpic': puser.avatar, 'designations': designations, 'participants': particip, 'todoview': True}
+		context= {'project': project, 'todolist': todolist, 'userpic': puser.avatar, 'designations': designations, 'participants': particip, 'todoview': True, 'pinnednotes':pinnednotes}
 
 		return render(request, 'projman/app.html', context)
 	else:

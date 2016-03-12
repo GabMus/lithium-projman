@@ -374,6 +374,38 @@
 
       {% endif %}
 
+      {% if pinnednotes %}
+      {% for note in pinnednotes %}
+      <tweaked-card mtitle="{{note.title}}" csize="big">
+
+          <div class="horizontal layout cardcontent">
+              <span>{{note.content}}</span>
+          </div>
+          <div class="card-actions horizontal layout center">
+              <paper-button onclick="location.href='{% url 'notecommentsview' note.id %}'">Comments</paper-button>
+      <span class="flex"></span>
+        <div>
+          <iron-icon icon="maps:pin-drop" class="mbadge"></iron-icon>
+          <paper-tooltip position="left">Pinned on top</paper-tooltip>
+        </div>
+      <div>
+      {% if note.author.user == user %}
+      <iron-icon icon="bookmark" class="mbadge"></iron-icon>
+      <paper-tooltip position="left">You are the author</paper-tooltip>
+      {% else %}
+        {% if note.author.avatar %}
+          <img class="microavatar" src="/media/{{note.author.avatar}}"></img>
+        {% else %}
+          <iron-icon icon="account-circle"></iron-icon>
+        {% endif %}
+      <paper-tooltip position="left">{{note.author.user.username}}</paper-tooltip>
+      {% endif %}
+      </div>
+      </div>
+      </tweaked-card>
+      {% endfor %}
+      {% endif %}
+
       {% if note or noteslist %}
       <!-- Note delete dialog -->
       <paper-dialog id="deleteNoteDialog" class="pdialog" modal>
