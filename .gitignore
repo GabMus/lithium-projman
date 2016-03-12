@@ -1,2 +1,3 @@
 server/lithium/email.py
 server/lithium/__pycache__/
+server/database.sqlite3

@@ -41,5 +41,18 @@ Contains the project documentation.
 
 	The reason this file hasn't been included (and is listed in the .gitignore file) is to avoid exposing my SMTP credentials, and to preserve yours.
 
+- cd in the /server folder and run:
+
+		./manage.py makemigrations
+		./manage.py migrate
+	
+	To generate the database file
+
+- (optional) It might be useful to create a superuser account to manage the database directly from the web interface. To do this run:
+
+		./manage.py createsuperuser
+
+	Notice that this superuser account won't initially have any access to the projman platfrom. From the admin interface you can add a new ProjmanUser entity using your newly created superuser account and linking it to said superuser account. This is not necessary or recommended, you can create a separate ProjmanUser without superuser privileges using the sign up form.
+
 ##Roadmap
 - 
