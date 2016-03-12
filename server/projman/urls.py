@@ -14,7 +14,6 @@ urlpatterns = [
 	url(r'^signout/?', views.signout, name='signout'),
 
 	url(r'^submitnewproj/?', views.submitnewproj, name='submitnewproj'),
-	url(r'^updateavatar/?', views.updateavatar, name='updateavatar'),
 
 	url(r'^project/(?P<projid>[0-9]+)/?$', views.projview, name='projview'),
 	url(r'^project/(?P<projid>[0-9]+)/notes?$', views.notesview, name='notesview'),

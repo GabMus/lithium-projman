@@ -10,9 +10,10 @@ from django.conf import settings
 import time
 import hashlib
 from smtplib import SMTPException
+from .verifications import *
 
-EMAIL_SUBJECT_HEADER="Lithium Projman: "
-EMAIL_INVITE_SUBJECT=" invited you to join his project!"
+EMAIL_SUBJECT_HEADER='Lithium Projman: '
+EMAIL_INVITE_SUBJECT=' invited you to join his project!'
 
 def get_or_none(model, *args, **kwargs):
 	try:
@@ -25,30 +26,34 @@ def signup(request):
 	return render(request, 'projman/signup.html', None)
 
 def submitsignup(request): #POST data is inside request
-	username=request.POST.get("username", None)
-	email=request.POST.get("email", None)
-	password=request.POST.get("password", None)
-	if username and email and password:
+	username=request.POST.get('username', None)
+	email=request.POST.get('email', None)
+	password=request.POST.get('password', None)
+	if username and not usernameExists(username) and emailIsValid(email) and password:
 		User.objects.create_user(username=username, email=email, password=password)
-	return HttpResponse('OK')
+		return HttpResponse('201')
+	else:
+		return HttpResponse('401')
 
 def signin(request):
-	return render(request, 'projman/signin.html', None)
+	if userIsLogged(request.user):
+		return redirect('/')
+	else:
+		return render(request, 'projman/signin.html', None)
 
 def submitsignin(request):
-	username=request.POST.get("username", None)
-	password=request.POST.get("password", None)
+	username=request.POST.get('username', None)
+	password=request.POST.get('password', None)
 	lgduser=authenticate(username=username, password=password)
 	if lgduser:
 		if lgduser.is_active:
 			login(request, lgduser)
-			print('user is authenticated and active')
-			return HttpResponse('OK')
+			return HttpResponse('200')
 		else:
-			print("The password is valid, but the account has been disabled!") #how can this happen??
+			print('The password is valid, but the account has been disabled!') #how can this happen??
 	else:
 		print('user does not exists') #shouldnt be happening
-		return HttpResponse('401')
+		return HttpResponse('403')
 
 def signout(request):
 	if request:
@@ -58,21 +63,18 @@ def signout(request):
 def submitnewproj(request):
 	name=request.POST.get("name")
 	desc=request.POST.get("description")
-	if request and not request.user.is_anonymous() and name:
-		user=get_object_or_404(ProjmanUser, user=request.user)
+	user=get_object_or_404(ProjmanUser, user=request.user)
+	if userIsLogged(user) and name:
 		proj=Project(name=name, description=desc, author=user)
 		proj.save()
 		part=Participation(user=user, project=proj)
 		part.save()
-	return HttpResponse('200')
-
-def updateavatar(request):
-	print(request.POST)
-	#pic=request.POST.get("")
-	return HttpResponse('200')
+		return HttpResponse('200')
+	else:
+		return HttpResponse('401')
 
 def index(request):
-	if request and not request.user.is_anonymous():
+	if request and userIsLogged(request.user):
 		puser=get_object_or_404(ProjmanUser, user=request.user)
 		partlist=Participation.objects.filter(user=puser)
 		projlist= []
@@ -83,56 +85,52 @@ def index(request):
 
 		return render(request, 'projman/app.html', context)
 	else:
-		#TODO: separate welcome view?
+		#TODO maybe: separate welcome view?
 		return render(request, 'projman/index.html', None)
 
 def toggletododone(request, todoid):
 	puser=get_object_or_404(ProjmanUser, user=request.user)
 	todo=get_object_or_404(To_do, id=todoid)
-	particip=Participation.objects.filter(project=todo.parent_project, user=puser)
-	if request and not request.user.is_anonymous() and particip:
-		print(type(request.POST.get("todoCheckbox")))
-		print(request.POST.get("todoCheckbox"))
-		#IGNOREME inverted booleans, the checkbox returns its state BEFORE it was pressed.
+	if userIsLogged(request.user) and userParticipatesProject(request.user, todo.parent_project):
 		if not request.POST.get("todoCheckbox") and not request.POST.get("todoCheckbox")=="":
 			todo.done=False
 		else:
 			todo.done=True
 		todo.save()
-
-	return HttpResponse("200")
+		return HttpResponse("200")
+	else:
+		return HttpResponse('401')
 
 def submitnewtodo(request):
-	rawDesign=request.POST.get("newtodoDesignations")
-	designationsList=[]
-	if rawDesign:
-		designationsList=rawDesign[:-1].split('|')
-
+	user=request.user
 	title=request.POST.get("title")
-	details=request.POST.get("details")
-	print(rawDesign)
 	proj= get_object_or_404(Project, id= request.POST.get("parentproj"))
-	if request and not request.user.is_anonymous() and title:
-		user=get_object_or_404(ProjmanUser, user=request.user)
-		todo=To_do(title=title, details=details, author=user, parent_project=proj)
+	if userIsLogged(user) and userParticipatesProject(user, proj) and title:
+		puser=get_object_or_404(ProjmanUser, user=user)
+		rawDesign=request.POST.get("newtodoDesignations")
+		designationsList=[]
+		if rawDesign:
+			designationsList=rawDesign[:-1].split('|')
+		details=request.POST.get("details")
+
+		todo=To_do(title=title, details=details, author=puser, parent_project=proj)
 		todo.save()
 
 		if designationsList:
 			for i in designationsList:
 				desi=Designation(user=get_object_or_404(ProjmanUser, user=get_object_or_404(User, username=i)), todo=todo)
 				desi.save()
-		#TODO: designation
-		#des=Participation(user=user, project=proj)
-		#part.save()
-	return HttpResponse('200')
+		return HttpResponse('200')
+	else:
+		return HttpResponse('401')
 
 def deletetodo(request, todoid):
-	puser=get_object_or_404(ProjmanUser, user=request.user)
+	user=request.user
 	todo=get_object_or_404(To_do, id=todoid)
-	particip=Participation.objects.filter(project=todo.parent_project, user=puser)
-	design=Designation.objects.filter(todo=todo)
-	if request and not request.user.is_anonymous() and particip:
-		proj=todo.parent_project
+	proj=todo.parent_project
+	if userIsLogged(user) and userParticipatesProject(user, proj): #TODO: user should be author?
+		puser=get_object_or_404(ProjmanUser, user=user)
+		design=Designation.objects.filter(todo=todo)
 		comments=Comment_todo.objects.filter(parent_todo=todo)
 		for i in comments:
 			i.delete()
@@ -141,6 +139,8 @@ def deletetodo(request, todoid):
 			for i in design:
 				i.delete()
 	return redirect('/project/'+str(proj.id))
+
+#FROM HERE DOWN OPTIMIZATION AND CLEANUP TO BE DONE
 
 def edittodo(request):
 	puser=get_object_or_404(ProjmanUser, user=request.user)
