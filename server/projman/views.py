@@ -15,12 +15,6 @@ from .verifications import *
 EMAIL_SUBJECT_HEADER='Lithium Projman: '
 EMAIL_INVITE_SUBJECT=' invited you to join his project!'
 
-def get_or_none(model, *args, **kwargs):
-	try:
-		return model.objects.get(*args, **kwargs)
-	except model.DoesNotExist:
-		return None
-
 # Create your views here.
 def signup(request):
 	return render(request, 'projman/signup.html', None)
@@ -176,7 +170,7 @@ def deletetodocomment(request, commentid):
 	puser=get_object_or_404(ProjmanUser, user=user)
 	comment=get_object_or_404(Comment_todo, id=commentid)
 	todo=comment.parent_todo
-	if userIsLogged(user) and comment.author==puser and userParticipatesProject(user, todo.parent_project):
+	if userIsLogged(user) and userIsAuthor(user, comment) and userParticipatesProject(user, todo.parent_project):
 		comment.delete()
 		return redirect('/todo/'+str(todo.id))
 	else:
@@ -194,7 +188,7 @@ def todoview(request, todoid):
 		context= {'commentstodolist': commentstodolist, 'todo': todo, 'designations': designations, 'participants': participants, 'project': proj}
 		return render(request, 'projman/app.html', context)
 	else:
-		return HttpResponse('401')
+		return redirect('/')
 
 def submittodocomment(request, todoid):
 	user=request.user
@@ -255,40 +249,40 @@ def submitnewnote(request):
 		note.save()
 	return HttpResponse('200')
 
-	#FROM HERE DOWN OPTIMIZATION AND CLEANUP TO BE DONE
 def notecommentsview(request, noteid):
-	puser=get_object_or_404(ProjmanUser, user=request.user)
+	user=request.user
 	note=get_object_or_404(Note, id=noteid)
-	particip=get_object_or_404(Participation, project=note.parent_project, user=puser)
-	if request and not request.user.is_anonymous() and particip:
-		proj=note.parent_project
+	proj=note.parent_project
+	if userIsLogged(user) and userParticipatesProject(user, proj):
+		puser=get_object_or_404(ProjmanUser, user=user)
 		commentsnotelist=Comment_note.objects.filter(parent_note=note).order_by('date_time')
 		context= {'commentsnotelist': commentsnotelist, 'note': note, 'project': proj}
 		return render(request, 'projman/app.html', context)
+	else:
+		return redirect('/')
 
 def editnote(request):
-	puser=get_object_or_404(ProjmanUser, user=request.user)
-	title=request.POST.get("title")
-	content=request.POST.get("content")
+	user=request.user
 	note=get_object_or_404(Note, id=request.POST.get("noteid"))
-	particip=Participation.objects.filter(project=note.parent_project, user=puser)
-	pinned=request.POST.get("pinned")
-	if request and not request.user.is_anonymous() and title and particip:
+	if userIsLogged(user) and userParticipatesProject(user, note.parent_project):
+		pinned=request.POST.get("pinned")
+		title=request.POST.get("title")
+		content=request.POST.get("content")
+		puser=get_object_or_404(ProjmanUser, user=user)
 		note.title=title
 		note.content=content
-		if pinned:
-			note.pinned=True
-		else:
-			note.pinned=False
+		note.pinned=bool(pinned)
 		note.save()
-	return HttpResponse('200')
+		return HttpResponse('200')
+	else:
+		return HttpResponse('401')
 
 def deletenote(request, noteid):
-	puser=get_object_or_404(ProjmanUser, user=request.user)
+	user=request.user
 	note=get_object_or_404(Note, id=noteid)
-	particip=Participation.objects.filter(project=note.parent_project, user=puser)
-	if request and not request.user.is_anonymous() and particip:
-		proj=note.parent_project
+	proj=note.parent_project
+	if userIsLogged(user) and userParticipatesProject(user, proj): #TODO: user should be author
+		puser=get_object_or_404(ProjmanUser, user=user)
 		comments=Comment_note.objects.filter(parent_note=note)
 		for i in comments:
 			i.delete()
@@ -296,21 +290,23 @@ def deletenote(request, noteid):
 	return redirect('/project/'+str(proj.id)+'/note')
 
 def submitnotecomment(request, noteid):
-	puser=get_object_or_404(ProjmanUser, user=request.user)
-	content=request.POST.get("content")
+	user=request.user
 	note= get_object_or_404(Note, id=noteid)
-	particip=Participation.objects.filter(project=note.parent_project, user=puser)
-	if request and not request.user.is_anonymous() and particip and content:
+	content=request.POST.get("content")
+	if userIsLogged(user) and userParticipatesProject(user, note.parent_project) and content:
+		puser=get_object_or_404(ProjmanUser, user=user)
 		comment=Comment_note(author=puser, content=content, parent_note=note)
 		comment.save()
-	return HttpResponse('200')
+		return HttpResponse('200')
+	else:
+		return HttpResponse('401')
 
 def deletenotecomment(request, commentid):
-	puser=get_object_or_404(ProjmanUser, user=request.user)
+	user=request.user
 	comment=get_object_or_404(Comment_note, id=commentid)
-	particip=Participation.objects.filter(project=comment.parent_note.parent_project, user=puser)
-	if request and not request.user.is_anonymous() and particip:
-		note=comment.parent_note
+	note=comment.parent_note
+	if userIsLogged(user) and userParticipatesProject(user, note.parent_project) and userIsAuthor(user, comment):
+		puser=get_object_or_404(ProjmanUser, user=user)
 		comment.delete()
 	return redirect('/note/'+str(note.id))
 
@@ -320,12 +316,12 @@ class ImageUploadForm(forms.Form):
 def userpicupload(request):
 	puser=get_object_or_404(ProjmanUser, user=request.user)
 	imform= ImageUploadForm(request.POST, request.FILES)
-	if imform.is_valid():
+	if imform.is_valid() and userIsLogged(request.user):
 		puser.avatar=imform.cleaned_data['image']
 		puser.save()
 		return redirect('/')
 	else:
-		return HttpResponse('403: forbidden')
+		return HttpResponse('403')
 
 def sendemail(subject, message, to):
 	try:
@@ -334,25 +330,28 @@ def sendemail(subject, message, to):
 	except SMTPException:
 		return False
 
-def sendinvite(request):
-	email=request.POST.get('invitemail')
+def sendinvite(request): #TODO: user should be project author?
 	projid=request.POST.get('projid')
 	proj=get_object_or_404(Project, id=projid)
-	tstamp=int(time.time())
-	unccode=str(tstamp)+str(projid)
-	unccode=unccode.encode()
-	code=hashlib.sha256(unccode).hexdigest()
-	pcode=Projcode(project=proj, code=code)
-	pcode.save()
-	baseurl=request.META['HTTP_HOST']
-	url='http://'+baseurl+'/getinvite/'+email+'/'+code
-	subj=EMAIL_SUBJECT_HEADER+request.user.username+EMAIL_INVITE_SUBJECT
-	message=request.user.username+" (email: "+request.user.email+") invited you to join his project "+proj.name+" on Lithium Projman.\nClick on the link below to join "+request.user.username+" now!\n"+url
-	result=sendemail(subj, message, email)
-	if result:
-		return HttpResponse('200')
+	email=request.POST.get('invitemail')
+	if userIsLogged(request.user) and userParticipatesProject(request.user, proj) and emailIsValid(email):
+		tstamp=int(time.time())
+		unccode=str(tstamp)+str(projid)
+		unccode=unccode.encode()
+		code=hashlib.sha256(unccode).hexdigest()
+		pcode=Projcode(project=proj, code=code)
+		pcode.save()
+		baseurl=request.META['HTTP_HOST']
+		url='http://'+baseurl+'/getinvite/'+email+'/'+code
+		subj=EMAIL_SUBJECT_HEADER+request.user.username+EMAIL_INVITE_SUBJECT
+		message=request.user.username+" (email: "+request.user.email+") invited you to join his project "+proj.name+" on Lithium Projman.\nClick on the link below to join "+request.user.username+" now!\n"+url
+		result=sendemail(subj, message, email)
+		if result:
+			return HttpResponse('200')
+		else:
+			return HttpResponse('400')
 	else:
-		return HttpResponse('400')
+		return HttpResponse('403')
 
 def submitinvitesignup(request):
 	username=request.POST.get("username")
@@ -361,7 +360,7 @@ def submitinvitesignup(request):
 	projcode=request.POST.get("pcode")
 	projcodeobj=get_object_or_404(Projcode, code=projcode)
 	proj=projcodeobj.project
-	if username and email and password and proj:
+	if not userameExists(username) and usernameIsValid(username) and emailIsValid(email) and password and proj:
 		User.objects.create_user(username=username, email=email, password=password)
 		u=get_object_or_404(User, username=username)
 		pu=get_object_or_404(ProjmanUser, user=u)
@@ -369,8 +368,9 @@ def submitinvitesignup(request):
 		part.save()
 		projcodeobj.delete()
 		return redirect('/signin')
-	return HttpResponse('403')
-
+	else:
+		context = {'invite': True, 'invitemail': email, 'pcode': projcode}
+		return render(request, 'projman/signup.html', context)
 
 def getinvite(request, email, projcode):
 	user=get_or_none(User, email=email)
@@ -386,10 +386,12 @@ def getinvite(request, email, projcode):
 		context = {'invite': True, 'invitemail': email, 'pcode': projcode}
 		return render(request, 'projman/signup.html', context)
 
+		#FROM HERE DOWN OPTIMIZATION AND CLEANUP TO BE DONE
 def deleteproject(request):
 	projid=request.POST.get('projid')
-	if request.POST.get('iamsure'):
-		project=get_object_or_404(Project, id=projid)
+	project=get_object_or_404(Project, id=projid)
+	user=request.user
+	if request.POST.get('iamsure') and userIsLogged(user) and userIsAuthor(user, project) and userParticipatesProject(user, project):
 		participationslist=Participation.objects.filter(project=project)
 		noteslist=Note.objects.filter(parent_project=project)
 		todolist=To_do.objects.filter(parent_project=project)

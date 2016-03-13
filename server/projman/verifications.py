@@ -2,6 +2,14 @@ import re
 from .models import *
 
 
+def get_or_none(model, *args, **kwargs):
+	try:
+		return model.objects.get(*args, **kwargs)
+	except model.DoesNotExist:
+		return None
+
+
+
 EMAIL_REGEX=re.compile(r'[^@]+@[^@]+\.[^@]+')
 USERNAME_REGEX=re.compile(r'^[a-zA-Z0-9_]*$')
 
@@ -17,8 +25,12 @@ def usernameExists(username):
     return User.filter(username=username).exists()
 
 def userParticipatesProject(user, project):
-    puser=ProjmanUser.objects.get(user=user)
+    puser=get_or_none(ProjmanUser, user=user)
     return Participation.objects.filter(user=puser, project=project).exists()
 
 def usernameIsValid(username):
     return (bool(username) and bool(USERNAME_REGEX.match(username)))
+
+def userIsAuthor(user, entity):
+    puser=get_or_none(ProjmanUser, user=user)
+    return entity.author==puser
