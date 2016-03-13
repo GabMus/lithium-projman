@@ -729,7 +729,7 @@
                                 <paper-item onclick="deleteNoteCall({{note.id}})">
                                     <span>Delete</span>
                                 </paper-item>
-                                <paper-item onclick="editNote({{note.id}}, '{{note.title}}', '{{note.content}}', '{{note.pinned}}')" >
+                                <paper-item onclick="editNote({{note.id}}, '{{note.title|escapejs}}', '{{note.content|escapejs}}', '{{note.pinned}}')" >
                                     <span>Edit</span>
                                 </paper-item>
                         </paper-menu>
@@ -782,7 +782,7 @@
                                 <paper-item onclick="deleteNoteCall({{note.id}})">
                                     <span>Delete</span>
                                 </paper-item>
-                                <paper-item onclick="editNote({{note.id}}, '{{note.title}}', '{{note.content}}', '{{note.pinned}}')" >
+                                <paper-item onclick="editNote({{note.id}}, '{{note.title|escapejs}}', '{{note.content|escapejs}}', '{{note.pinned}}')" >
                                     <span>Edit</span>
                                 </paper-item>
                         </paper-menu>

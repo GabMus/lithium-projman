@@ -63,11 +63,12 @@ def signout(request):
 def submitnewproj(request):
 	name=request.POST.get("name")
 	desc=request.POST.get("description")
-	user=get_object_or_404(ProjmanUser, user=request.user)
+	user=request.user
+	puser=get_object_or_404(ProjmanUser, user=user)
 	if userIsLogged(user) and name:
-		proj=Project(name=name, description=desc, author=user)
+		proj=Project(name=name, description=desc, author=puser)
 		proj.save()
-		part=Participation(user=user, project=proj)
+		part=Participation(user=puser, project=proj)
 		part.save()
 		return HttpResponse('200')
 	else:
@@ -105,6 +106,7 @@ def submitnewtodo(request):
 	user=request.user
 	title=request.POST.get("title")
 	proj= get_object_or_404(Project, id= request.POST.get("parentproj"))
+	print(str(userIsLogged(user))+"\n"+str(userParticipatesProject(user, proj))+"\n"+title)
 	if userIsLogged(user) and userParticipatesProject(user, proj) and title:
 		puser=get_object_or_404(ProjmanUser, user=user)
 		rawDesign=request.POST.get("newtodoDesignations")
