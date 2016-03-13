@@ -29,7 +29,7 @@ def submitsignup(request): #POST data is inside request
 	username=request.POST.get('username', None)
 	email=request.POST.get('email', None)
 	password=request.POST.get('password', None)
-	if username and not usernameExists(username) and emailIsValid(email) and password:
+	if not usernameExists(username) and emailIsValid(email) and usernameIsValid(username) and password:
 		User.objects.create_user(username=username, email=email, password=password)
 		return HttpResponse('201')
 	else:
@@ -106,7 +106,6 @@ def submitnewtodo(request):
 	user=request.user
 	title=request.POST.get("title")
 	proj= get_object_or_404(Project, id= request.POST.get("parentproj"))
-	print(str(userIsLogged(user))+"\n"+str(userParticipatesProject(user, proj))+"\n"+title)
 	if userIsLogged(user) and userParticipatesProject(user, proj) and title:
 		puser=get_object_or_404(ProjmanUser, user=user)
 		rawDesign=request.POST.get("newtodoDesignations")
@@ -197,38 +196,39 @@ def todoview(request, todoid):
 	else:
 		return HttpResponse('401')
 
-#FROM HERE DOWN OPTIMIZATION AND CLEANUP TO BE DONE
 def submittodocomment(request, todoid):
-	puser=get_object_or_404(ProjmanUser, user=request.user)
-	content=request.POST.get("content")
+	user=request.user
 	todo= get_object_or_404(To_do, id=todoid)
-	particip=Participation.objects.filter(project=todo.parent_project, user=puser)
-	if request and not request.user.is_anonymous() and particip and content:
-		print("all passed")
+	if userIsLogged(user) and userParticipatesProject(user, todo.parent_proj) and content:
+		puser=get_object_or_404(ProjmanUser, user=user)
+		content=request.POST.get("content")
 		comment=Comment_todo(author=puser, content=content, parent_todo=todo)
 		comment.save()
-	return HttpResponse('200')
+		return HttpResponse('200')
+	else:
+		return HttpResponse('401')
 
 def projview(request, projid):
-	if request and not request.user.is_anonymous():
+	user=request.user
+	project=get_object_or_404(Project, id=projid)
+	if userIsLogged(user) and userParticipatesProject(user, project):
 		puser=get_object_or_404(ProjmanUser, user=request.user)
-		project=get_object_or_404(Project, id=projid)
 		todolist=To_do.objects.filter(parent_project=project).order_by('done')
-		particip=Participation.objects.filter(project=project)
+		participants=Participation.objects.filter(project=project)
 		designations=[]
 		pinnednotes=Note.objects.filter(parent_project=project, pinned=True)
 		for i in todolist:
 			d=Designation.objects.filter(todo=i)
 			for j in d:
 				designations.append(j)
-
 		userpic=puser.avatar
-		context= {'project': project, 'todolist': todolist, 'userpic': puser.avatar, 'designations': designations, 'participants': particip, 'todoview': True, 'pinnednotes':pinnednotes}
+		context= {'project': project, 'todolist': todolist, 'userpic': puser.avatar, 'designations': designations, 'participants': participants, 'todoview': True, 'pinnednotes':pinnednotes}
 
 		return render(request, 'projman/app.html', context)
 	else:
-		return render(request, 'projman/index.html', None)
+		return redirect('/')
 
+		#FROM HERE DOWN OPTIMIZATION AND CLEANUP TO BE DONE
 def notesview(request, projid):
 	if request and not request.user.is_anonymous():
 		puser=get_object_or_404(ProjmanUser, user=request.user)

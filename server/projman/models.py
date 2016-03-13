@@ -19,7 +19,6 @@ class ProjmanUser(models.Model): #inherits Django default user class
 class Project(models.Model):
 	#id is already defined as default in django
 	author=models.ForeignKey('ProjmanUser', null=False)
-	private=models.BooleanField(default=False)
 	date_time=models.DateTimeField(auto_now_add=True)
 	name=models.CharField(max_length=250, blank=False)
 	description=models.TextField(blank=True)
