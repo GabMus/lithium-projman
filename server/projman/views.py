@@ -228,34 +228,34 @@ def projview(request, projid):
 	else:
 		return redirect('/')
 
-		#FROM HERE DOWN OPTIMIZATION AND CLEANUP TO BE DONE
 def notesview(request, projid):
-	if request and not request.user.is_anonymous():
+	user=request.user
+	project=get_object_or_404(Project, id=projid)
+	if userIsLogged(user) and userParticipatesProject(user, project):
 		puser=get_object_or_404(ProjmanUser, user=request.user)
-		project=get_object_or_404(Project, id=projid)
 		noteslist=Note.objects.filter(parent_project=project).order_by('-pinned')
 		particip=Participation.objects.filter(project=project)
-
 		userpic=puser.avatar
 		context= {'project': project, 'noteslist': noteslist, 'userpic': puser.avatar, 'notesview': True}
-
 		return render(request, 'projman/app.html', context)
 	else:
-		return render(request, 'projman/index.html', None)
+		return redirect('/')
 
 def submitnewnote(request):
-	pinned=request.POST.get("pinned")
-	title=request.POST.get("title")
-	content=request.POST.get("content")
+	user=request.user
 	proj= get_object_or_404(Project, id= request.POST.get("parentproj"))
-	if request and not request.user.is_anonymous() and title:
-		user=get_object_or_404(ProjmanUser, user=request.user)
-		note=Note(title=title, content=content, author=user, parent_project=proj)
+	if userIsLogged(user) and userParticipatesProject(user, proj):
+		pinned=request.POST.get("pinned")
+		title=request.POST.get("title")
+		content=request.POST.get("content")
+		puser=get_object_or_404(ProjmanUser, user=user)
+		note=Note(title=title, content=content, author=puser, parent_project=proj)
 		if pinned:
 			note.pinned=True
 		note.save()
 	return HttpResponse('200')
 
+	#FROM HERE DOWN OPTIMIZATION AND CLEANUP TO BE DONE
 def notecommentsview(request, noteid):
 	puser=get_object_or_404(ProjmanUser, user=request.user)
 	note=get_object_or_404(Note, id=noteid)
