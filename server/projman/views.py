@@ -140,23 +140,19 @@ def deletetodo(request, todoid):
 				i.delete()
 	return redirect('/project/'+str(proj.id))
 
-#FROM HERE DOWN OPTIMIZATION AND CLEANUP TO BE DONE
-
 def edittodo(request):
-	puser=get_object_or_404(ProjmanUser, user=request.user)
-	title=request.POST.get("title")
-	details=request.POST.get("details")
+	user=request.user
 	todo=get_object_or_404(To_do, id=request.POST.get("todoid"))
-	particip=Participation.objects.filter(project=todo.parent_project, user=puser)
-
-	rawDesign=request.POST.get("edittodoDesignations")
-	designationsList=[]
-	if rawDesign:
-		designationsList=rawDesign[:-1].split('|')
-	oldDesigns=Designation.objects.filter(todo=todo)
-	for i in oldDesigns:
-		print(i.user.user.username)
-	if request and not request.user.is_anonymous() and title and particip:
+	project=todo.parent_project
+	title=request.POST.get("title")
+	if userIsLogged(user) and userParticipatesProject(user, project) and title:
+		puser=get_object_or_404(ProjmanUser, user=user)
+		details=request.POST.get("details")
+		rawDesign=request.POST.get("edittodoDesignations")
+		designationsList=[]
+		if rawDesign:
+			designationsList=rawDesign[:-1].split('|')
+		oldDesigns=Designation.objects.filter(todo=todo)
 		todo.title=title
 		todo.details=details
 		todo.save()
@@ -170,29 +166,36 @@ def edittodo(request):
 			duser=get_object_or_404(ProjmanUser, user=get_object_or_404(User, username=i))
 			des=Designation(user=duser, todo=todo)
 			des.save()
-	return HttpResponse('200')
+		return HttpResponse('200')
+	else:
+		return HttpResponse('401')
 
 def deletetodocomment(request, commentid):
-	puser=get_object_or_404(ProjmanUser, user=request.user)
+	user=request.user
+	puser=get_object_or_404(ProjmanUser, user=user)
 	comment=get_object_or_404(Comment_todo, id=commentid)
-	particip=Participation.objects.filter(project=comment.parent_todo.parent_project, user=puser)
-	if request and not request.user.is_anonymous() and particip:
-		todo=comment.parent_todo
+	todo=comment.parent_todo
+	if userIsLogged(user) and comment.author==puser and userParticipatesProject(user, todo.parent_project):
 		comment.delete()
-	return redirect('/todo/'+str(todo.id))
+		return redirect('/todo/'+str(todo.id))
+	else:
+		return HttpResponse('401')
 
 def todoview(request, todoid):
-	puser=get_object_or_404(ProjmanUser, user=request.user)
+	user=request.user
 	todo=get_object_or_404(To_do, id=todoid)
-	particip=Participation.objects.filter(project=todo.parent_project, user=puser)
 	proj=todo.parent_project
-	participants=Participation.objects.filter(project=proj)
-	if request and not request.user.is_anonymous() and particip:
+	if userIsLogged(user) and userParticipatesProject(user, proj):
+		participants=Participation.objects.filter(project=proj)
+		puser=get_object_or_404(ProjmanUser, user=user)
 		commentstodolist=Comment_todo.objects.filter(parent_todo=todo).order_by('date_time')
 		designations=Designation.objects.filter(todo=todo)
 		context= {'commentstodolist': commentstodolist, 'todo': todo, 'designations': designations, 'participants': participants, 'project': proj}
 		return render(request, 'projman/app.html', context)
+	else:
+		return HttpResponse('401')
 
+#FROM HERE DOWN OPTIMIZATION AND CLEANUP TO BE DONE
 def submittodocomment(request, todoid):
 	puser=get_object_or_404(ProjmanUser, user=request.user)
 	content=request.POST.get("content")
