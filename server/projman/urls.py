@@ -43,6 +43,8 @@ urlpatterns = [
 	url(r'^getinvite/(?P<email>[^@]+@[^@]+\.[^@]+)/(?P<projcode>.+)/?$', views.getinvite, name = 'getinvite'),
 	url(r'^deleteproject/?$', views.deleteproject, name = 'deleteproject'),
 	url(r'^mytasks/?$', views.mytasksview, name = 'mytasks'),
-	url(r'^leaveproject/(?P<projid>[0-9]+)/?$', views.leaveproject, name = 'leaveproject')
+	url(r'^leaveproject/(?P<projid>[0-9]+)/?$', views.leaveproject, name = 'leaveproject'),
+
+	url(r'^kickuser/(?P<projid>[0-9]+)/(?P<username>[a-zA-Z0-9_]+)/?$', views.kickuser, name = 'kickuser')
 
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

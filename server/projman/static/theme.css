@@ -235,3 +235,9 @@ paper-checkbox {
   display: block;
   margin-bottom: 25px;
 }
+
+.userlistbox {
+  max-height: 250px;
+  height: 100%;
+  overflow-y: auto;
+}

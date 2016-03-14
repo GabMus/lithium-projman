@@ -471,39 +471,52 @@ def mytasksview(request):
 		return redirect('/')
 
 
+def kickfromproject(user, project):
+	admin = project.author
+	puser = get_object_or_404(ProjmanUser, user = user)
+	usertodos = To_do.objects.filter(author = puser, parent_project = project)
+	usernotes = Note.objects.filter(author = puser, parent_project = project)
+	part=get_object_or_404(Participation, user = puser, project = project)
+	commsTodo = []
+	commsNote = []
+	ptodos = To_do.objects.filter(parent_project = project)
+	pnotes = Note.objects.filter(parent_project = project)
+	designations=[]
+	for i in ptodos:
+		icomments = Comment_todo.objects.filter(parent_todo = i, author = puser)
+		idesigns = Designation.objects.filter(user = puser, todo = i)
+		for j in icomments:
+			commsTodo.append(j)
+		for j in idesigns:
+			designations.append(j)
+	for i in pnotes:
+		icomments = Comment_note.objects.filter(parent_note = i, author = puser)
+		for j in icomments:
+			commsNote.append(j)
+	# start 'leave' process
+	for i in usertodos:
+		i.author = admin
+		i.save()
+	for i in usernotes:
+		i.author = admin
+		i.save()
+	for i in designations:
+		i.delete()
+	part.delete()
+
+
 def leaveproject(request, projid):
 	user = request.user
 	project = get_object_or_404(Project, id = projid)
 	if userIsLogged(user) and userParticipatesProject(user, project):
-		admin = project.author
-		puser = get_object_or_404(ProjmanUser, user = request.user)
-		usertodos = To_do.objects.filter(author = puser, parent_project = project)
-		usernotes = Note.objects.filter(author = puser, parent_project = project)
-		part=get_object_or_404(Participation, user = puser, project = project)
-		commsTodo = []
-		commsNote = []
-		ptodos = To_do.objects.filter(parent_project = project)
-		pnotes = Note.objects.filter(parent_project = project)
-		designations=[]
-		for i in ptodos:
-			icomments = Comment_todo.objects.filter(parent_todo = i, author = puser)
-			idesigns = Designation.objects.filter(user = puser, todo = i)
-			for j in icomments:
-				commsTodo.append(j)
-			for j in idesigns:
-				designations.append(j)
-		for i in pnotes:
-			icomments = Comment_note.objects.filter(parent_note = i, author = puser)
-			for j in icomments:
-				commsNote.append(j)
-		# start 'leave' process
-		for i in usertodos:
-			i.author = admin
-			i.save()
-		for i in usernotes:
-			i.author = admin
-			i.save()
-		for i in designations:
-			i.delete()
-		part.delete()
+		kickfromproject(user, project)
 	return redirect('/')
+
+
+def kickuser(request, projid, username):
+	admin=request.user
+	project=get_object_or_404(Project, id=projid)
+	user=get_object_or_404(User, username=username)
+	if userIsLogged(admin) and userIsAuthor(admin, project) and  userParticipatesProject(user, project):
+		kickfromproject(user, project)
+	return redirect('/project/'+str(projid))

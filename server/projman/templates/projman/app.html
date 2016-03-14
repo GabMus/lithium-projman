@@ -30,6 +30,9 @@
     href="{% static 'elements/tweaked-card.html' %}">
 
     <link rel="import"
+    href="{% static 'elements/participant-row.html' %}">
+
+    <link rel="import"
     href="{% static 'elements/toolbar-element.html' %}">
 
     <link rel="import"
@@ -334,7 +337,7 @@
         <form is="iron-form" id="sendinvitation" action="{% url 'sendinvite' %}" method="POST">
                     {% csrf_token %}
                 <div class="vertical layout">
-                    <span>Invite someone to {{project.name}}</span>
+                    <p class="headertext">Invite someone</p>
                     <paper-input class="cardcontent" label="Email" type="text" id="" name="invitemail" required></paper-input>
                     <input style="display: none;" name="projid" value="{{project.id}}">
                     <div class="horizontal container center-justified">
@@ -344,7 +347,34 @@
                     </div>
                 </div>
         </form>
-        <div class="vertical layout">
+        {% if project.author.user == request.user %}
+        <p class="headertext spacer">Participants</p>
+        <div class="vertical layout userlistbox">
+          {% for participant in participants %}
+          {% if participant.user != project.author %}
+
+                <div class="horizontal layout center" style="border-top: 1px solid #CDCDCD;">
+                  <div class="vertical layout">
+                    <span class="flex"></span>
+                      <span>{{participant.user.user.username}}</span>
+                    <span class="flex"></span>
+                  </div>
+                  <span class="flex"></span>
+                  <paper-menu-button horizontal-offset="35" vertical-offset="0"  horizontal-align="right">
+                      <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                      <paper-menu class="dropdown-content">
+                              <paper-item onclick="location.href='/kickuser/{{participant.project.id}}/{{participant.user.user.username}}';">
+                                  <span>Kick from project</span>
+                              </paper-item>
+                      </paper-menu>
+                  </paper-menu-button>
+                </div>
+
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+        <div class="vertical layout spacerfab">
           <paper-button style="color: red; font-weight: bold;" onclick="document.getElementById('deleteProjectAreyousure').open();" dialog-dismiss>
         {% if project.author.user == request.user %}
           Delete this project
