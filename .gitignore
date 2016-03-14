@@ -1,3 +1,5 @@
 server/lithium/email.py
 server/lithium/__pycache__/
 server/database.sqlite3
+server/media/uploads
+server/media/media/uploads

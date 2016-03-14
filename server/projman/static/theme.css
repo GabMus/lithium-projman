@@ -223,6 +223,10 @@ paper-checkbox {
     --paper-checkbox-checked-color: #F50057;
 }
 
+.headertext {
+    font-size: 14pt;
+}
+
 .roundpic {
   width: 150px;
   height: 150px;

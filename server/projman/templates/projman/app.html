@@ -344,31 +344,47 @@
                     </div>
                 </div>
         </form>
-        {% if project.author.user == request.user %}
         <div class="vertical layout">
-          <paper-button style="color: red; font-weight: bold;" onclick="document.getElementById('deleteProjectAreyousure').open();" dialog-dismiss>Delete this project</paper-button>
-        </div>
+          <paper-button style="color: red; font-weight: bold;" onclick="document.getElementById('deleteProjectAreyousure').open();" dialog-dismiss>
+        {% if project.author.user == request.user %}
+          Delete this project
+        {% else %}
+          Leave this project
         {% endif %}
+          </paper-button>
+        </div>
           <div class="buttons">
             <paper-button dialog-dismiss>Done</paper-button>
           </div>
         </paper-dialog>
 
-        {% if project.author.user == request.user %}
+        {% if project %}
         <paper-dialog id="deleteProjectAreyousure" class="pdialog" modal>
-          <h2>Are you sure you want to delete this project?</h2>
-          <h2>EVERYTHING inside it will be GONE FOREVER!</h2>
-        <form is="iron-form" id="deleteprojectform" action="{% url 'deleteproject' %}" method="POST">
-                    {% csrf_token %}
-                <div class="vertical layout">
-                    <paper-checkbox class="cardcontent" name="iamsure">Yes, I am sure</paper-checkbox>
-                    <input style="display: none;" name="projid" value="{{project.id}}">
+          {% if project.author.user == request.user %}
+                <p class="headertext">Are you sure you want to delete this project?</p>
+                <p class="headertext">EVERYTHING inside it will be GONE FOREVER!</p>
+              <form is="iron-form" id="deleteprojectform" action="{% url 'deleteproject' %}" method="POST">
+                          {% csrf_token %}
+                      <div class="vertical layout">
+                          <paper-checkbox class="cardcontent" name="iamsure">Yes, I am sure</paper-checkbox>
+                          <input style="display: none;" name="projid" value="{{project.id}}">
+                      </div>
+              </form>
+              <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button style="color: red;" onclick="document.getElementById('deleteprojectform').addEventListener('iron-form-response', function() { location.href='/';}); document.getElementById('deleteprojectform').submit();">Confirm deletion</paper-button>
+              </div>
+          {% else %}
+                <p class="headertext">Are you sure you want to leave this project?</p>
+                <p class="headertext">The project author will become the new author of the notes and to do's that you wrote.</p>
+                <p class="headertext">All your comments will be deleted and gone forever.</p>
+                <div class="buttons">
+                  <paper-button dialog-dismiss>Cancel</paper-button>
+                  <paper-button style="color: red;" onclick="location.href='{% url 'leaveproject' project.id %}'">Confirm</paper-button>
                 </div>
-        </form>
-          <div class="buttons">
-            <paper-button dialog-dismiss>Cancel</paper-button>
-            <paper-button style="color: red;" onclick="document.getElementById('deleteprojectform').addEventListener('iron-form-response', function() { location.href='/';}); document.getElementById('deleteprojectform').submit();">Confirm deletion</paper-button>
-          </div>
+          {% endif %}
+
+
         </paper-dialog>
         {% endif %}
 
@@ -485,6 +501,7 @@
     {% if todo %}
                 <tweaked-card mtitle="{{todo.title}}" csize="big">
 
+                  {% if todo.author.user == request.user %}
                     <paper-menu-button class="cardMenuButton" horizontal-offset="35" vertical-offset="35"  horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu class="dropdown-content">
@@ -496,6 +513,7 @@
                                 </paper-item>
                         </paper-menu>
                     </paper-menu-button>
+                    {% endif %}
 
                     <div class="horizontal layout cardcontent">
                     <form is="iron-form" id="formToggleTodoDone{{todo.id}}" action="{% url 'toggleTodoDone' todo.id %}" method="POST">
@@ -513,7 +531,7 @@
                 <paper-tooltip position="left">You are the author</paper-tooltip>
                 {% else %}
                   {% if todo.author.avatar %}
-                    <img class="microavatar" src="{{todo.author.avatar}}"></img>
+                    <img class="microavatar" src="/media/{{todo.author.avatar}}"></img>
                   {% else %}
                     <iron-icon icon="account-circle"></iron-icon>
                   {% endif %}
@@ -631,6 +649,7 @@
             {% for todo in todolist %}
                 <tweaked-card mtitle="{{todo.title}}" csize="big">
 
+                  {% if todo.author.user == request.user %}
                     <paper-menu-button class="cardMenuButton" horizontal-offset="35" vertical-offset="35"  horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu class="dropdown-content">
@@ -642,6 +661,7 @@
                                 </paper-item>
                         </paper-menu>
                     </paper-menu-button>
+                    {% endif %}
 
                     <div class="horizontal layout cardcontent">
                     <form is="iron-form" id="formToggleTodoDone{{todo.id}}" action="{% url 'toggleTodoDone' todo.id %}" method="POST">
@@ -655,6 +675,7 @@
                 <span class="flex"></span>
 
                 <div>
+                {% if not mytasks %}
                 {% if todo.author.user == user %}
                 <iron-icon icon="bookmark" class="mbadge"></iron-icon>
                 <paper-tooltip position="left">You are the author</paper-tooltip>
@@ -666,7 +687,11 @@
                   {% endif %}
                 <paper-tooltip position="left">{{todo.author.user.username}}</paper-tooltip>
                 {% endif %}
+                {% endif %}
                 </div>
+                {% if mytasks %} <!-- if I am in mytasks, show the parent project instead of the designations -->
+                <paper-button onclick="location.href='{% url 'projview' todo.parent_project.id %}'">{{todo.parent_project.name}}</paper-button>
+                {% else %}
                         <iron-icon icon="arrow-forward"></iron-icon>
                             {% for d in designations %}
                                 {% if d.todo.id == todo.id %}
@@ -680,7 +705,9 @@
                                         <paper-tooltip position="left">{{d.user.user.username}}</paper-tooltip>
                                     </div>
                                 {% endif %}
-                            {% endfor %}</div>
+                            {% endfor %}
+                            {% endif %}
+                          </div>
                 </tweaked-card>
             {% endfor %}
         {% else %}
@@ -723,6 +750,7 @@
             {% for note in noteslist %}
                 <tweaked-card mtitle="{{note.title}}" csize="big">
 
+                    {% if note.author.user == request.user %}
                     <paper-menu-button class="cardMenuButton" horizontal-offset="35" vertical-offset="35"  horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu class="dropdown-content">
@@ -734,6 +762,7 @@
                                 </paper-item>
                         </paper-menu>
                     </paper-menu-button>
+                      {% endif %}
 
                     <div class="horizontal layout cardcontent">
                         <span>{{note.content}}</span>
@@ -776,6 +805,7 @@
     {% if note %}
                 <tweaked-card mtitle="{{note.title}}" csize="big">
 
+                    {% if note.author.user == request.user %}
                     <paper-menu-button class="cardMenuButton" horizontal-offset="35" vertical-offset="35"  horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu class="dropdown-content">
@@ -787,6 +817,7 @@
                                 </paper-item>
                         </paper-menu>
                     </paper-menu-button>
+                      {% endif %}
 
                     <div class="horizontal layout cardcontent">
                         <span>{{note.content}}</span>
@@ -806,7 +837,7 @@
                         <paper-tooltip position="left">You are the author</paper-tooltip>
                       {% else %}
                         {% if note.author.avatar %}
-                          <img class="microavatar" src="{{note.author.avatar}}"></img>
+                          <img class="microavatar" src="/media/{{note.author.avatar}}"></img>
                         {% else %}
                           <iron-icon icon="account-circle"></iron-icon>
                         {% endif %}
@@ -936,15 +967,20 @@
           <span class="usrname">// {{user.username}}</span>
       </div>
       <div class="topbtncont">
-            {% if project %}
-            {% if not todolist %}
+            {% if not mytasks %}
+                <paper-button class="fullbleedbtn" onclick="location.href='{% url 'mytasks' %}'">My tasks</paper-button>
+            {% endif %}
+            {% if project or mytasks %}
+            {% if not todolist and project %}
                 <paper-button class="fullbleedbtn" onclick="location.href='{% url 'projview' project.id %}'">To dos</paper-button>
             {% endif %}
-            {% if not noteslist %}
+            {% if not noteslist and project %}
                 <paper-button class="fullbleedbtn" onclick="location.href='{% url 'notesview' project.id %}'">Notes</paper-button>
             {% endif %}
                 <paper-button class="fullbleedbtn" onclick="location.href='/'">Projects</paper-button>
+                {% if project %}
                 <paper-button class="fullbleedbtn" onclick="document.getElementById('projSettingsDialog').open()">Project settings</paper-button>
+                {% endif %}
             {% else %}
             {% endif %}
       </div>
