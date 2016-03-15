@@ -15,7 +15,6 @@
 
 Project management platform.
 Django backend, Polymer frontend.
-~~Provides an open API for implementing apps.~~
 
 ##Requirements
 - Django 1.9.x
@@ -51,8 +50,3 @@ Contains the project documentation.
 - (optional) It might be useful to create a superuser account to manage the database directly from the web interface. To do this run:
 
 		./manage.py createsuperuser
-
-	Notice that this superuser account won't initially have any access to the projman platfrom. From the admin interface you can add a new ProjmanUser entity using your newly created superuser account and linking it to said superuser account. This is not necessary or recommended, you can create a separate ProjmanUser without superuser privileges using the sign up form.
-
-##Roadmap
-- 
