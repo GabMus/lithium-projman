@@ -1,4 +1,22 @@
 /*
+    This file is part of Lithium-Projman.
+
+    Lithium-Projman is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Lithium-Projman is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Lithium-Projman.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+/*
  * This is a basic set of colors for the
  * whole project. Edit the values to change
  * the look of the website.
@@ -8,10 +26,15 @@
  * accent: #F50057
  */
 
+ html {
+  height: 100%;
+}
+
 body {
+    height: 100%;
     background-color: #EDEDED;
-    padding: 0 auto;
-    margin: 0 auto;
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
     font-family: Roboto, Arial, sans-serif;
     font-size: 12pt;
 }

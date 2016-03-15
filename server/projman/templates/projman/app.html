@@ -1,3 +1,20 @@
+<!--
+    This file is part of Lithium-Projman.
+
+    Lithium-Projman is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Lithium-Projman is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Lithium-Projman.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
 <!DOCTYPE html>
 {% load staticfiles %}
 <html>
@@ -30,7 +47,7 @@
     href="{% static 'elements/tweaked-card.html' %}">
 
     <link rel="import"
-    href="{% static 'elements/participant-row.html' %}">
+    href="{% static 'elements/footer-element.html' %}">
 
     <link rel="import"
     href="{% static 'elements/toolbar-element.html' %}">
@@ -115,7 +132,7 @@
       function submitTodo() {
         var menu=document.getElementById("newTodoDesignMenu").selectedItems;
         var menuVals="";
-        for (i=0; i<menu.length; i++) {
+        if (menu) for (i=0; i<menu.length; i++) {
             menuVals+=menu[i].getAttribute('value')+"|";
         }
         document.getElementById('newtodoDesignations').value=menuVals;
@@ -338,7 +355,7 @@
 
 		<paper-drawer-panel id="drawerpanel">
 
-      <paper-header-panel main class="flex" style="width:100%;">
+      <paper-header-panel main class="vertical layout" style="width:100%; min-height: 100%;">
       <toolbar-element mtitle="{% if userindex %}Projects{% endif %}{% if project %}{{project.name}}{% endif %}{% if todo %}{{todo.parent_project.name}}{% endif %}"
       drawerbtn tbarposition="relative" class="paper-header" id="mtbar">
       <paper-icon-button class="middle" icon="menu" onclick="toggleDrawer()"></paper-icon-button>
@@ -1034,6 +1051,7 @@
         <div class="bottombtncont">
           <paper-button class="fullbleedbtn" onclick="openSettings()">Settings</paper-button>
           <paper-button class="fullbleedbtn" onclick="signout()">Sign out</paper-button>
+          <paper-button class="fullbleedbtn" onclick="location.href='https://github.com/gabmus/lithium-projman'">Source code</paper-button>
         </div>
       </div>
   </div>

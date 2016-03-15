@@ -1,3 +1,21 @@
+<!--
+    This file is part of Lithium-Projman.
+
+    Lithium-Projman is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Lithium-Projman is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Lithium-Projman.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+
 <!DOCTYPE html>
 {% load staticfiles %}
 <html>
@@ -24,6 +42,9 @@
 
     <link rel="import"
     href="{% static 'elements/toolbar-element.html' %}">
+
+    <link rel="import"
+    href="{% static 'elements/footer-element.html' %}">
 
     <link rel="import"
     href="{% static 'bower_components/iron-flex-layout/iron-flex-layout-classes.html' %}">
@@ -71,14 +92,9 @@
 
 
 
-<body>
-    <div class="vertical layout center">
+<body class="vertical layout center">
     <toolbar-element mtitle="// Signup" tbarposition="relative">
 
-
-		 <div id="tabsBar" class="flex center horizontal layout toolbar-tools">
-
-		</div>
         </toolbar-element>
 
     <form is="iron-form" id="signupform" action="{% if invite %}{% url 'submitinvitesignup' %}{% else %}{% url 'submitsignup' %}{% endif %}" method="POST">
@@ -106,7 +122,7 @@
  	}
  	document.getElementById('signupform').addEventListener('iron-form-response', this.formResponse);
      </script>
-
-        <div class="footer"></div>
+     <span class="flex"></span>
+     <footer-element></footer-element>
 </body>
 </html>
