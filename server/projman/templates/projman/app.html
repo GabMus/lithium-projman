@@ -300,17 +300,33 @@
 				<div class="vertical layout">
           <form action="{% url 'uploadpic' %}" method="POST" enctype="multipart/form-data" id="uploadpicform">
             {% csrf_token %}
-                <p>Change user picture</p>
+                <p class="headertext">Change user picture</p>
                 <p>
                     <input id="id_image" type="file" name="image">
                 </p>
                 <paper-button onclick="document.getElementById('uploadpicform').submit()">Submit</paper-button>
             </form>
+            <paper-button style="color:red;font-weight:bold;" class="spacer" onclick="document.getElementById('deleteaccountdialog').open();" dialog-dismiss>Delete account</paper-button>
  				</div>
 		  <div class="buttons">
 			<paper-button dialog-dismiss>Done</paper-button>
 		  </div>
 		</paper-dialog>
+
+    <paper-dialog id="deleteaccountdialog" class="pdialog" modal>
+            <p class="headertext">Are you sure you want to delete your account?</p>
+            <p class="headertext">EVERYTHING you've done will be gone FOREVER!</p>
+          <form is="iron-form" id="deleteaccountform" action="{% url 'deleteuser' %}" method="POST">
+                      {% csrf_token %}
+                  <div class="vertical layout">
+                      <paper-checkbox class="cardcontent" name="iamsure">Yes, I am sure</paper-checkbox>
+                  </div>
+          </form>
+          <div class="buttons">
+            <paper-button dialog-dismiss>Cancel</paper-button>
+            <paper-button style="color: red;" onclick="document.getElementById('deleteaccountform').addEventListener('iron-form-response', function() { location.href='/';}); document.getElementById('deleteaccountform').submit();">Confirm deletion</paper-button>
+          </div>
+    </paper-dialog>
 
     <paper-dialog id="signoutdialog" class="pdialog" modal>
 		  <h2>Do you really want to sign out?</h2>

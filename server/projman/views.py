@@ -425,34 +425,37 @@ def deleteproject(request):
 	project = get_object_or_404(Project, id = projid)
 	user = request.user
 	if request.POST.get('iamsure') and userIsLogged(user) and userIsAuthor(user, project) and userParticipatesProject(user, project):
-		participationslist = Participation.objects.filter(project = project)
-		noteslist = Note.objects.filter(parent_project = project)
-		todolist = To_do.objects.filter(parent_project = project)
-		tcommlist= []
-		ncommlist= []
-		for i in noteslist:
-			ncomms = Comment_note.objects.filter(parent_note = i)
-			for j in ncomms:
-				ncommlist.append(j)
-		for i in todolist:
-			tcomms = Comment_todo.objects.filter(parent_todo = i)
-			for j in tcomms:
-				tcommlist.append(j)
-		# begin deletion
-		for i in tcommlist:
-			i.delete()
-		for i in ncommlist:
-			i.delete()
-		for i in todolist:
-			i.delete()
-		for i in noteslist:
-			i.delete()
-		for i in participationslist:
-			i.delete()
-		project.delete()
+		deleteTargetProject(project)
 		return HttpResponse('200')
 	else:
 		return HttpResponse('400')
+
+def deleteTargetProject(project):
+	participationslist = Participation.objects.filter(project = project)
+	noteslist = Note.objects.filter(parent_project = project)
+	todolist = To_do.objects.filter(parent_project = project)
+	tcommlist= []
+	ncommlist= []
+	for i in noteslist:
+		ncomms = Comment_note.objects.filter(parent_note = i)
+		for j in ncomms:
+			ncommlist.append(j)
+	for i in todolist:
+		tcomms = Comment_todo.objects.filter(parent_todo = i)
+		for j in tcomms:
+			tcommlist.append(j)
+	# begin deletion
+	for i in tcommlist:
+		i.delete()
+	for i in ncommlist:
+		i.delete()
+	for i in todolist:
+		i.delete()
+	for i in noteslist:
+		i.delete()
+	for i in participationslist:
+		i.delete()
+	project.delete()
 
 
 def mytasksview(request):
@@ -520,3 +523,23 @@ def kickuser(request, projid, username):
 	if userIsLogged(admin) and userIsAuthor(admin, project) and  userParticipatesProject(user, project):
 		kickfromproject(user, project)
 	return redirect('/project/'+str(projid))
+
+
+def deleteuser(request):
+	user=request.user
+	iamsure=request.POST.get('iamsure')
+	if userIsLogged(user) and iamsure:
+		puser=get_object_or_404(ProjmanUser, user=user)
+		# delete projects the user created
+		uprojects=Project.objects.filter(author=puser)
+		for i in uprojects:
+			deleteTargetProject(i)
+		# leave all participated projects
+		parts=Participation.objects.filter(user=puser)
+		for i in parts:
+			kickfromproject(user, i.project)
+		puser.delete()
+		user.delete()
+		return HttpResponse('200')
+	else:
+		return HttpResponse('403')
