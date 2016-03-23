@@ -65,6 +65,66 @@
         @apply(--layout-wrap);
         @apply(--layout-around-justified);
       }
+
+      .welcome, .fullbleedSection {
+          background-size: cover;
+      	height: 100vh;
+      	width: 100%;
+      	margin: 0 0 0 0;
+          z-index: 0;
+          display: block;
+          color: white;
+          text-shadow: 0 0 7px black;
+      }
+
+      .welcome {
+      	background: url("/media/img/splashscreen.jpg") no-repeat center;
+      }
+
+      .welcome-textbox {
+        /*margin-top: 180px;
+        margin-bottom: 50px;*/
+        font-family: Roboto Lighter, Roboto Thin, Roboto, Arial, sans-serif;
+        color: white;
+        text-align: center;
+      }
+
+      .fullbleedSection {
+          @apply(--layout-horizontal);
+          @apply(--layout-around-justified);
+          @apply(--layout-wrap);
+          padding: 144px 24px 144px 24px;
+      }
+
+        .indexTitle {
+            font-size: 30pt;
+        }
+
+      .indexSec1 {
+          background: url("/media/img/splashscreen.jpg") no-repeat center;
+      }
+
+      .indexSec2 {
+          background: url("/media/img/splashscreen.jpg") no-repeat center;
+      }
+
+      .indexSec3 {
+          background: url("/media/img/splashscreen.jpg") no-repeat center;
+      }
+
+      .indexSec4 {
+          background: url("/media/img/splashscreen.jpg") no-repeat center;
+      }
+
+      .indexSec5 {
+          background: url("/media/img/splashscreen.jpg") no-repeat center;
+      }
+
+      .vbox {
+          @apply(--layout-vertical);
+          @apply(--layout-center);
+          height: 100%;
+      }
     </style>
     <style>
         @import url({% static 'theme.css' %});
@@ -75,68 +135,73 @@
 <body>
       <toolbar-element mtitle="Lithium" lucid><paper-button onClick="location.href='/signin'">Sign in</paper-button></toolbar-element>
     <div class="welcome">
-    	<div class="vertical layout center">
+    	<div class="vbox">
+            <span class="flex"></span>
         <div class="welcome-textbox">
-          <h1>Lithium //</h1>
+          <h1 class="indexTitle">Lithium //</h1>
 
           <h2>// Team work, improved</h2>
         </div>
     		<paper-button class="accentbtn bigbtn" onclick="location.href='/signup'">Sign Up</paper-button>
+            <span class="flex"></span>
     	</div>
     </div>
-    <div class="vertical layout center">
       <div class="container flex-wrap justify">
-        <tweaked-card>
-          <div class="vertical layout center xcardcontent">
-            <img src="/media/img/defaultuserpic.png" class="roundpic"></img>
-            <h2>Don't be slacking</h2>
+        <div class="fullbleedSection indexSec1">
+            <div class="vbox">
+                <span class="flex"></span>
+            <p class="indexTitle">Don't be slacking</p>
             <span>
               Get your work done. Now. Oh, you need Joe to make this or that thing? Just tell him and keep on working. It's Joe's problem now.
             </span>
-          </div>
-        </tweaked-card>
-        <tweaked-card>
-          <div class="vertical layout center xcardcontent">
-            <img src="/media/img/defaultuserpic.png" class="roundpic"></img>
-            <h2>Keep track</h2>
+            <span class="flex"></span>
+            </div>
+      </div>
+        <div class="fullbleedSection indexSec1">
+            <div class="vbox">
+                <span class="flex"></span>
+            <p class="indexTitle">Keep track</p>
             <span>
               "Is this thing done? What do we need next? What's the roadmap? Hey Charlie, do you have the link to the cloud folder with all the documents?"<br />
               No more. Make shared notes, update them and pin the important information on top. This way you have no excuse.
             </span>
-          </div>
-        </tweaked-card>
-        <tweaked-card>
-          <div class="vertical layout center xcardcontent">
-            <img src="/media/img/defaultuserpic.png" class="roundpic"></img>
-            <h2>Interact</h2>
+            <span class="flex"></span>
+        </div>
+      </div>
+        <div class="fullbleedSection indexSec1">
+            <div class="vbox">
+                <span class="flex"></span>
+            <p class="indexTitle">Interact</p>
             <span>
               Human beings have to interact with each other. If something isn't clear, leave a comment as you'd do on your favourite social network.
             </span>
-          </div>
-        </tweaked-card>
-        <tweaked-card>
-          <div class="vertical layout center xcardcontent">
-            <img src="/media/img/defaultuserpic.png" class="roundpic"></img>
-            <h2>One service</h2>
+            <span class="flex"></span>
+            </div>
+      </div>
+        <div class="fullbleedSection indexSec1">
+            <div class="vbox">
+                <span class="flex"></span>
+            <p class="indexTitle">One service</p>
             <span>
               This is a webapp. It means it's a website, but it's optimized to be used as an actual application. No need to download anything, just go to the website on your favourite device or operating system.<br />
               Note: if your favourite operating system isn't Linux you should rethink your priorities.
             </span>
-          </div>
-        </tweaked-card>
-        <tweaked-card>
-          <div class="vertical layout center xcardcontent">
-            <img src="/media/img/defaultuserpic.png" class="roundpic"></img>
-            <h2>Free. As in freedom.</h2>
+            <span class="flex"></span>
+            </div>
+      </div>
+        <div class="fullbleedSection indexSec1">
+            <div class="vbox">
+                <span class="flex"></span>
+            <p class="indexTitle">Free. As in freedom.</p>
             <span>
               This software is under the GPLv3 license. This means you can use it in any way you want, and you also have access to the source code.<br />
               You can basically do whatever you want. And you know how your data is treated.
             </span>
+            <span class="flex"></span>
+            </div>
           </div>
-        </tweaked-card>
         </div>
         <span class="flex"></span>
         <footer-element></footer-element>
-      </div>
 </body>
 </html>
